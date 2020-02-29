@@ -1,0 +1,116 @@
+<div class="row" xmlns:th="http://www.thymeleaf.org">
+	<div class="col-md-12">
+		<h4>
+			<span th:text="${town.name}"></span>/<span id="townCode"
+				th:text="${town.code}"></span> <small><a
+				th:href="${collectUrl}" th:text="${collectUrl}" target="_blank"></a>
+			</small>
+		</h4>
+		<hr />
+	</div>
+</div>
+<div class="row" xmlns:th="http://www.thymeleaf.org">
+	<div class="col-md-10">
+		<div class="form-inline">
+			<div class="form-group">
+				<label th:text="#{stats_code}"> </label> <input type="text"
+					class="form-control input-sm" id="query_village_code" />
+			</div>
+			<div class="form-group">
+				<label th:text="#{name}"> </label> <input type="text"
+					class="form-control input-sm" id="query_village_name" />
+			</div>
+
+		</div>
+	</div>
+	<div class="col-md-2" style="text-align: right">
+		<button id="btn_village_query" class="btn btn-success btn-sm">
+			<i class="fa fa-search"></i> <span th:text="#{search}"></span>
+		</button>
+	</div>
+</div>
+<br />
+<table id="table_village_list">
+</table>
+
+<div class="modal fade" id="edit_village" role="basic"
+	aria-hidden="true" xmlns:th="http://www.thymeleaf.org">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-body">
+				<img th:src="@{/assets/global/img/loading-spinner-grey.gif}" alt=""
+					class="loading"> <span th:text="#{modal_loading}"></span>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript" th:inline="javascript"
+	xmlns:th="http://www.thymeleaf.org">
+	/*<![CDATA[*/
+
+	$(function() {
+		$('#table_village_list').bootstrapTable({
+			url: '/original/villages',
+		   	method: 'post',
+		   	pagination: true,    
+            sortable: true,     
+            sortOrder: 'asc', 
+			striped: true,
+		 	pageSize: 25,   
+            pageList: [10, 25, 50, 100],
+            sidePagination: 'server', 
+            search: false,  
+            queryParams : function (params) {
+          		return {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                	limit: params.limit,   //页面大小
+                   	offset: params.offset,  //页码
+                   	sort: params.sort,
+                   	order: params.order, 
+                   	townCode : $.trim($('#townCode').text()),
+                   	code : $.trim($('#query_village_code').val()),
+                   	name : $.trim($('#query_village_name').val())
+              	};
+           	},    
+           	strictSearch: false,
+           	idField : 'code',
+		   	columns: [
+		   		{
+			      	field: 'code',
+			        title: [[#{stats_code}]],
+			        sortable: true
+			  	},
+			  	{
+		          	field: 'category',
+		          	title: [[#{city_or_country_category}]],
+		          	sortable: true
+		        },
+		        {
+		          	field: 'name',
+		          	title: [[#{name}]],
+		          	sortable: true
+		        },	
+		        {
+			      	field: 'oper',
+			       	title: [[#{action}]],
+			      	width:65,
+			       	align: 'center',
+			       	formatter: 'villageOperateFormatter'
+			    }
+		   	] 
+		});
+		
+		$('#btn_village_query').click(function(){
+			 $('#table_village_list').bootstrapTable('refresh');
+			 return false;
+		});
+	});
+	
+	function villageOperateFormatter(value, row, index) {
+		return '<a href="/original/village_' + row.code + '" data-target="#edit_village" data-toggle="modal" class="btn btn-circle btn-icon-only btn-default" title="' + [[#{edit}]] +'"><i class="fa fa-pencil"></i></a>';
+	}
+	
+	/*]]>*/
+</script>
+
+
