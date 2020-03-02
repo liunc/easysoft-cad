@@ -1,7 +1,6 @@
 package com.easysoft.cad.domain.service.impl;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -75,23 +74,26 @@ public class CollectUrlServiceImpl implements CollectUrlService {
 	@Autowired
 	private CustomProperties properties;
 
-	protected Document requestWebPage(String url) throws EasysoftException {
+	protected Document requestWebPage(String collectUrl) throws EasysoftException {
 
 		int i = 0;
 		String errorMessage = "";
-		String baseUrl = url.substring(0, url.lastIndexOf('/') + 1) ;
-		
+		String baseUrl = collectUrl.substring(0, collectUrl.lastIndexOf('/') + 1);
+
 		while (i <= 5) {
 			try {
-				return Jsoup.parse(new URL(url).openStream(), "GBK", baseUrl);
-			} 
-			catch (MalformedURLException e){
-				errorMessage = this.messageSource.getMessage("request_web_url_failed", new Object[] { e.getMessage(), url, baseUrl });
-			}
-			catch (IOException e) {
-				errorMessage = this.messageSource.getMessage("request_web_url_failed", new Object[] { e.getMessage(), url, baseUrl });
+				URL url = new URL(collectUrl);
+				HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+				connection.setConnectTimeout(8 * 1000);
+				connection.setReadTimeout(8 * 1000);
+				connection.setInstanceFollowRedirects(false);
+				return Jsoup.parse(connection.getInputStream(), "GBK", baseUrl);
+			} catch (Exception e) {
+				errorMessage = this.messageSource.getMessage("request_web_url_failed",
+						new Object[] { i + 1, e.getMessage(), collectUrl, baseUrl });
 			}
 			logger.error(errorMessage);
+			i++;
 		}
 		throw new EasysoftException(errorMessage);
 	}
@@ -267,8 +269,7 @@ public class CollectUrlServiceImpl implements CollectUrlService {
 
 		long count = this.collectUrlRepository.count();
 		if (count == 0) {
-			this.collectUrlRepository
-					.save(this.createCollectUrl(properties.getEntryUrl(), UrlCategory.PROVINCE, ""));
+			this.collectUrlRepository.save(this.createCollectUrl(properties.getEntryUrl(), UrlCategory.PROVINCE, ""));
 		}
 
 		for (CollectUrl current : this.collectUrlRepository.findByStatusNot(UrlStatus.SUCCESS)) {
@@ -291,8 +292,7 @@ public class CollectUrlServiceImpl implements CollectUrlService {
 	}
 
 	@Override
-	public Page<CollectUrl> findAll(String url, String urlCategory, String urlCode, String status,
-			Pageable pageable) {
+	public Page<CollectUrl> findAll(String url, String urlCategory, String urlCode, String status, Pageable pageable) {
 
 		return this.collectUrlRepository.findAll(new Specification<CollectUrl>() {
 
@@ -333,9 +333,10 @@ public class CollectUrlServiceImpl implements CollectUrlService {
 		}, pageable);
 	}
 
+	@Override
 	public String getUrl(String urlCode) {
 		CollectUrl entity = this.collectUrlRepository.findByUrlCode(urlCode);
-		if(entity == null) {
+		if (entity == null) {
 			return "";
 		}
 		return entity.getUrl();
