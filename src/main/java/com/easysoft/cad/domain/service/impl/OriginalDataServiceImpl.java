@@ -10,17 +10,21 @@ import javax.persistence.criteria.Root;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import com.easysoft.cad.domain.entity.OriginalAll;
 import com.easysoft.cad.domain.entity.OriginalCity;
 import com.easysoft.cad.domain.entity.OriginalCounty;
 import com.easysoft.cad.domain.entity.OriginalProvince;
 import com.easysoft.cad.domain.entity.OriginalTown;
 import com.easysoft.cad.domain.entity.OriginalVillage;
 import com.easysoft.cad.domain.service.OriginalDataService;
+import com.easysoft.cad.infrastructure.repository.OriginalAllRepository;
 import com.easysoft.cad.infrastructure.repository.OriginalCityRepository;
 import com.easysoft.cad.infrastructure.repository.OriginalCountyRepository;
 import com.easysoft.cad.infrastructure.repository.OriginalProvinceRepository;
@@ -48,12 +52,15 @@ public class OriginalDataServiceImpl implements OriginalDataService {
 	private OriginalVillageRepository originalVillageRepository;
 
 	@Autowired
+	private OriginalAllRepository originalAllRepository;
+
+	@Autowired
 	private EasysoftMessageSource messageSource;
 
 	@Override
 	public Page<OriginalProvince> findProvinces(String code, String name, Pageable pageable) {
 
-		return this.originalProvinceRepository.findAll(new Specification<OriginalProvince>() {
+		return this.originalProvinceRepository.(new Specification<OriginalProvince>() {
 
 			/**
 			 * 
@@ -331,5 +338,123 @@ public class OriginalDataServiceImpl implements OriginalDataService {
 		OriginalVillage entity = this.findVillage(code);
 		entity.updateName(name);
 		this.originalVillageRepository.save(entity);
+	}
+
+	@Async("taskExecutor")
+	@Override
+	public void loadDataToAll() {
+		long count = this.originalAllRepository.count();
+		if (count != 0) {
+			this.originalAllRepository.deleteAll();
+		}
+		count = this.originalVillageRepository.count();
+
+		int size = 1000;
+		long page = count / size;
+		if (count % size > 0) {
+			page += 1;
+		}
+
+		for (int i = 0; i < page; i++) {
+			Page<OriginalVillage> villages = this.originalVillageRepository.findAll(PageRequest.of(i, size));
+			List<OriginalAll> entities = new ArrayList<OriginalAll>();
+			OriginalProvince province = new OriginalProvince();
+			OriginalCity city = new OriginalCity();
+			OriginalCounty county = new OriginalCounty();
+			OriginalTown town = new OriginalTown();
+			for (OriginalVillage village : villages.getContent()) {
+				OriginalAll entity = new OriginalAll();
+				entity.create(village.getCode(), village.getCategory(), village.getName());
+
+				if (!entity.getProvinceCode().equals(province.getCode())) {
+					OriginalProvince provinceEntity = this.originalProvinceRepository
+							.findByCode(entity.getProvinceCode());
+					if (provinceEntity == null) {
+						province.create(entity.getProvinceCode(), "");
+					} else {
+						province = provinceEntity;
+					}
+				}
+				entity.setProvinceName(province.getName());
+
+				if (!entity.getCityCode().equals(city.getCode())) {
+					OriginalCity cityEntity = this.originalCityRepository.findByCode(entity.getCityCode());
+					if (cityEntity == null) {
+						city.create(entity.getCityCode(), "");
+					} else {
+						city = cityEntity;
+					}
+				}
+				entity.setCityName(city.getName());
+
+				if (!entity.getCountyCode().equals(county.getCode())) {
+					OriginalCounty countyEntity = this.originalCountyRepository.findByCode(entity.getCountyCode());
+					if (countyEntity == null) {
+						county.create(entity.getCountyCode(), "");
+					} else {
+						county = countyEntity;
+					}
+				}
+				entity.setCountyName(county.getName());
+
+				if (!entity.getTownCode().equals(town.getCode())) {
+					OriginalTown townEntity = this.originalTownRepository.findByCode(entity.getTownCode());
+					if (townEntity == null) {
+						town.create(entity.getTownCode(), "");
+					} else {
+						town = townEntity;
+					}
+				}
+				entity.setTownName(town.getName());
+
+				entities.add(entity);
+			}
+			this.originalAllRepository.saveAll(entities);
+		}
+	}
+	
+	@Override
+	public Page<OriginalAll> findAll(String provinceName, String cityName, String countyName, String townName, String villageName, Pageable pageable) {
+		return this.originalAllRepository.findAll(new Specification<OriginalAll>() {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = -3950053446063792958L;
+
+			@Override
+			public Predicate toPredicate(Root<OriginalAll> root, CriteriaQuery<?> query,
+					CriteriaBuilder criteriaBuilder) {
+
+				List<Predicate> list = new ArrayList<Predicate>();
+
+				if (StringUtils.hasText(provinceName)) {
+					list.add(criteriaBuilder.like(root.get("provinceName").as(String.class), "%" + provinceName + "%"));
+				}
+
+				if (StringUtils.hasText(cityName)) {
+					list.add(criteriaBuilder.like(root.get("cityName").as(String.class), "%" + cityName + "%"));
+				}
+				
+				if (StringUtils.hasText(countyName)) {
+					list.add(criteriaBuilder.like(root.get("countyName").as(String.class), "%" + countyName + "%"));
+				}
+				
+				if (StringUtils.hasText(townName)) {
+					list.add(criteriaBuilder.like(root.get("townName").as(String.class), "%" + townName + "%"));
+				}
+				
+				if (StringUtils.hasText(villageName)) {
+					list.add(criteriaBuilder.like(root.get("villageName").as(String.class), "%" + villageName + "%"));
+				}
+
+				if (list.size() > 0) {
+					Predicate[] p = new Predicate[list.size()];
+					return criteriaBuilder.and(list.toArray(p));
+				}
+
+				return null;
+			}
+		}, pageable);
 	}
 }

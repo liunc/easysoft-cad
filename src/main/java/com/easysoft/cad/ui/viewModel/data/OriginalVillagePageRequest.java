@@ -1,19 +1,19 @@
-package com.easysoft.cad.ui.viewModel.originalData;
+package com.easysoft.cad.ui.viewModel.data;
 
 import com.easysoft.core.web.viewModel.BootstrapTableRequest;
 
-public class OriginalProvincePageRequest extends BootstrapTableRequest {
-
-	private String provinceCode;
+public class OriginalVillagePageRequest extends BootstrapTableRequest {
+ 
+	private String townCode;
 	private String code;
-	private String name;
+	private String name; 
 
-	public String getProvinceCode() {
-		return provinceCode;
+	public String getTownCode() {
+		return townCode;
 	}
 
-	public void setProvinceCode(String provinceCode) {
-		this.provinceCode = provinceCode;
+	public void setTownCode(String townCode) {
+		this.townCode = townCode;
 	}
 
 	public String getCode() {

@@ -3,6 +3,7 @@ package com.easysoft.cad.domain.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.easysoft.cad.domain.entity.OriginalAll;
 import com.easysoft.cad.domain.entity.OriginalCity;
 import com.easysoft.cad.domain.entity.OriginalCounty;
 import com.easysoft.cad.domain.entity.OriginalProvince;
@@ -41,4 +42,8 @@ public interface OriginalDataService {
 	public void updateTown(String code, String name) throws EasysoftException;
 	
 	public void updateVillage(String code, String name) throws EasysoftException;
+	
+	public void loadDataToAll();
+	
+	public Page<OriginalAll> findAll(String provinceName, String cityName, String countyName, String townName, String villageName, Pageable pageable);
 }

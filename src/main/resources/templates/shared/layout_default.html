@@ -66,9 +66,9 @@ License: You must have a valid license purchased only from themeforest(the above
 		<div class="page-header-inner ">
 			<!-- BEGIN LOGO -->
 			<div class="page-logo">
-								<a th:href="@{/}"> <img
-									th:src="@{/assets/layouts/layout2/img/logo-default.png}" alt="logo"
-									class="logo-default" />
+				<a th:href="@{/}"> <img
+					th:src="@{/assets/layouts/layout2/img/logo-default.png}" alt="logo"
+					class="logo-default" />
 				</a>
 				<div class="menu-toggler sidebar-toggler">
 					<!-- DOC: Remove the above "hide" to enable the sidebar toggler button on header -->
@@ -448,22 +448,44 @@ License: You must have a valid license purchased only from themeforest(the above
 							class="title" th:text="#{homepage}"></span> <span class="arrow"></span>
 					</a></li>
 
-					<li class="nav-item"><a href="javascript:;"
-						class="nav-link nav-toggle"> <i class="icon-layers"></i> <span
+					<li class="nav-item"><a th:href="@{/collect/index}"
+						class="nav-link nav-toggle"> <i class="fa fa-link"></i> <span
 							class="title" th:text="#{collect}"></span> <span class="arrow"></span>
+					</a></li>
+
+					<li class="nav-item"><a href="javascript:;"
+						class="nav-link nav-toggle"> <i class="fa fa-database"></i> <span
+							class="title" th:text="#{original_data}"></span> <span class="arrow"></span>
 					</a>
-						<ul class="sub-menu">
-							<li class="nav-item  "><a th:href="@{/collect/index}"
-								class="nav-link "> <i class="fa fa-link"></i> <span
-									class="title" th:text="#{url_list}"></span>
-							</a></li>
+					<ul class="sub-menu">
 							<li class="nav-item  "><a th:href="@{/original/index}"
-								class="nav-link "> <i class="fa fa-database"></i> <span
-									class="title" th:text="#{original_data}"></span>
+								class="nav-link "> <span class="title"
+									th:text="#{level_data}"> </span>
+							</a></li>
+							<li class="nav-item  "><a th:href="@{/original/all}"
+								class="nav-link "> <span class="title" th:text="#{all_data}">
+								</span>
 							</a></li>
 						</ul></li>
 
 
+
+
+
+					<li class="nav-item"><a th:href="@{/clean/index}"
+						class="nav-link nav-toggle"> <i class="icon-shuffle"></i> <span
+							class="title" th:text="#{clean}"></span> <span class="arrow"></span>
+					</a>
+						<ul class="sub-menu">
+							<li class="nav-item  "><a th:href="@{/clean/rule}"
+								class="nav-link "> <span class="title" th:text="#{rule}">
+								</span>
+							</a></li>
+							<li class="nav-item  "><a href="javascript:;"
+								class="nav-link "> <span class="title" th:text="#{scheme}">
+								</span>
+							</a></li>
+						</ul></li>
 
 
 

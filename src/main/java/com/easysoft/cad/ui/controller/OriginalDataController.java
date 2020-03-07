@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.easysoft.cad.domain.entity.OriginalAll;
 import com.easysoft.cad.domain.entity.OriginalCity;
 import com.easysoft.cad.domain.entity.OriginalCounty;
 import com.easysoft.cad.domain.entity.OriginalProvince;
@@ -27,16 +28,17 @@ import com.easysoft.cad.domain.entity.OriginalTown;
 import com.easysoft.cad.domain.entity.OriginalVillage;
 import com.easysoft.cad.domain.service.CollectUrlService;
 import com.easysoft.cad.domain.service.OriginalDataService;
-import com.easysoft.cad.ui.viewModel.originalData.OriginalCityEditRequest;
-import com.easysoft.cad.ui.viewModel.originalData.OriginalCityPageRequest;
-import com.easysoft.cad.ui.viewModel.originalData.OriginalCountyEditRequest;
-import com.easysoft.cad.ui.viewModel.originalData.OriginalCountyPageRequest;
-import com.easysoft.cad.ui.viewModel.originalData.OriginalProvinceEditRequest;
-import com.easysoft.cad.ui.viewModel.originalData.OriginalProvincePageRequest;
-import com.easysoft.cad.ui.viewModel.originalData.OriginalTownEditRequest;
-import com.easysoft.cad.ui.viewModel.originalData.OriginalTownPageRequest;
-import com.easysoft.cad.ui.viewModel.originalData.OriginalVillageEditRequest;
-import com.easysoft.cad.ui.viewModel.originalData.OriginalVillagePageRequest;
+import com.easysoft.cad.ui.viewModel.data.OriginalAllPageRequest;
+import com.easysoft.cad.ui.viewModel.data.OriginalCityEditRequest;
+import com.easysoft.cad.ui.viewModel.data.OriginalCityPageRequest;
+import com.easysoft.cad.ui.viewModel.data.OriginalCountyEditRequest;
+import com.easysoft.cad.ui.viewModel.data.OriginalCountyPageRequest;
+import com.easysoft.cad.ui.viewModel.data.OriginalProvinceEditRequest;
+import com.easysoft.cad.ui.viewModel.data.OriginalProvincePageRequest;
+import com.easysoft.cad.ui.viewModel.data.OriginalTownEditRequest;
+import com.easysoft.cad.ui.viewModel.data.OriginalTownPageRequest;
+import com.easysoft.cad.ui.viewModel.data.OriginalVillageEditRequest;
+import com.easysoft.cad.ui.viewModel.data.OriginalVillagePageRequest;
 import com.easysoft.core.util.EasysoftException;
 import com.easysoft.core.util.EasysoftMessageSource;
 import com.easysoft.core.web.viewModel.AjaxResponse;
@@ -121,7 +123,7 @@ public class OriginalDataController {
 		}
 		return response;
 	}
-	
+
 	@RequestMapping("/city")
 	public String city(Model model, @RequestParam("province") String provinceCode) {
 		OriginalProvince province = null;
@@ -177,8 +179,7 @@ public class OriginalDataController {
 
 	@RequestMapping(value = "/city/edit", method = RequestMethod.POST)
 	@ResponseBody
-	public AjaxResponse cityEdit(@RequestBody @Valid OriginalCityEditRequest request,
-			BindingResult validatedResult) {
+	public AjaxResponse cityEdit(@RequestBody @Valid OriginalCityEditRequest request, BindingResult validatedResult) {
 
 		AjaxResponse response = new AjaxResponse(validatedResult);
 
@@ -198,7 +199,7 @@ public class OriginalDataController {
 		}
 		return response;
 	}
-	
+
 	@RequestMapping("/county")
 	public String county(Model model, @RequestParam("city") String cityCode) {
 		OriginalCity city = null;
@@ -275,7 +276,7 @@ public class OriginalDataController {
 		}
 		return response;
 	}
-	
+
 	@RequestMapping("/town")
 	public String town(Model model, @RequestParam("county") String countyCode) {
 		/* 特殊处理，部分地级市没有区县，直接下属乡镇，如广东省中山市，东莞市 */
@@ -349,8 +350,7 @@ public class OriginalDataController {
 
 	@RequestMapping(value = "/town/edit", method = RequestMethod.POST)
 	@ResponseBody
-	public AjaxResponse townEdit(@RequestBody @Valid OriginalTownEditRequest request,
-			BindingResult validatedResult) {
+	public AjaxResponse townEdit(@RequestBody @Valid OriginalTownEditRequest request, BindingResult validatedResult) {
 
 		AjaxResponse response = new AjaxResponse(validatedResult);
 
@@ -370,7 +370,7 @@ public class OriginalDataController {
 		}
 		return response;
 	}
-	
+
 	@RequestMapping("/village")
 	public String village(Model model, @RequestParam("town") String townCode) {
 		OriginalTown town = null;
@@ -444,6 +444,52 @@ public class OriginalDataController {
 				response.setResult(false);
 				response.setMessage(this.messageSource.getMessage("edit_failed", new Object[] { ex.getMessage() }));
 			}
+		}
+		return response;
+	}
+
+	@RequestMapping("/all")
+	public String all(Model model) {
+		return "original/all";
+	}
+
+	@RequestMapping(value = "/all", method = RequestMethod.POST)
+	@ResponseBody
+	public BootstrapTableResponse<OriginalAll> getAll(@RequestBody OriginalAllPageRequest request) {
+
+		BootstrapTableResponse<OriginalAll> response = new BootstrapTableResponse<OriginalAll>();
+
+		Pageable pageable = PageRequest.of(request.getPage(), request.getLimit());
+		if (StringUtils.hasText(request.getSort())) {
+			pageable = PageRequest.of(request.getPage(), request.getLimit(),
+					request.isDesc() ? Direction.DESC : Direction.ASC, request.getSort());
+		}
+
+		Page<OriginalAll> entities = this.originalDataService.findAll(request.getProvinceName(), request.getCityName(),
+				request.getCountyName(), request.getTownName(), request.getVillageName(), pageable);
+		if (entities == null || entities.getTotalElements() == 0) {
+			return response;
+		}
+		response.setRows(entities.getContent());
+		response.setTotal(entities.getTotalElements());
+
+		return response;
+	}
+
+	@RequestMapping(value = "/load/all", method = RequestMethod.POST)
+	@ResponseBody
+	public AjaxResponse loadAll() {
+
+		AjaxResponse response = new AjaxResponse();
+
+		try {
+			this.originalDataService.loadDataToAll();
+			response.setMessage(this.messageSource.getMessage("action_success"));
+			response.setResult(true);
+
+		} catch (Exception ex) {
+			logger.error(ex.toString());
+			response.setMessage(this.messageSource.getMessage("action_failed", new Object[] { ex.getMessage() }));
 		}
 		return response;
 	}

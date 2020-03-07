@@ -7,14 +7,14 @@
 </th:block>
 <th:block th:fragment="page_title">
 	<h1 class="page-title">
-		<span th:text="#{url_list}"> </span> <small></small>
+		<span th:text="#{clean_rule}"> </span> <small></small>
 	</h1>
 </th:block>
 <div th:fragment="page_bar">
 	<ul class="page-breadcrumb">
 		<li><i class="icon-home"></i> <a href="/" th:text="#{homepage}"></a>
 			<i class="fa fa-angle-right"></i></li>
-		<li><span th:text="#{collect}"> </span></li>
+		<li><span th:text="#{clean}"> </span></li>
 	</ul>
 </div>
 <th:block th:fragment="content">
@@ -28,30 +28,13 @@
 						<div class="col-md-8 col-sm-12">
 							<div class="form-inline">
 								<div class="form-group">
-									<label th:text="#{url}"> </label> <input id="query_url"
-										type="text" class="form-control input-sm"></input>
-								</div>
-								<div class="form-group">
-									<label th:text="#{category}"> </label> <select
-										id="query_url_category" class="form-control input-sm">
+									<label th:text="#{data_category}"> </label> <select
+										id="query_data_category" class="form-control input-sm">
 										<option value="" th:text="#{all}"></option>
 										<option th:each="category : ${categoryList}"
 											th:value="${category.key}" th:text="${category.value}"></option>
 									</select>
 								</div>
-								<div class="form-group">
-									<label th:text="#{code}"> </label> <input id="query_url_code"
-										type="text" class="form-control input-sm"></input>
-								</div>
-								<div class="form-group">
-									<label th:text="#{status}"></label> <select id="query_status"
-										class="form-control input-sm">
-										<option value="" th:text="#{all}"></option>
-										<option th:each="status : ${statusList}"
-											th:value="${status.key}" th:text="${status.value}"></option>
-									</select>
-								</div>
-
 							</div>
 						</div>
 						<div class="col-md-4 col-sm-12" style="text-align: right">
@@ -59,15 +42,28 @@
 								<i class="fa fa-search"></i> <span th:text="#{search}"></span>
 							</button>
 
-							<a id="btn_collect" href="javascript:;" class="btn btn-info btn-sm" onclick="startCollect()" style="display: ${canCollect}">
+							<a href="/clean/rule_add" data-target="#modal_rule" data-toggle="modal" class="btn btn-info btn-sm">
 								<i class="fa fa-plus"></i> <span class="hidden-xs"
-								th:text="#{collect}"></span>
+								th:text="#{add}"></span>
 							</a>
 						</div>
 					</div>
 					<br />
 					<table id="table_list">
 					</table>
+					
+					<div class="modal fade" id="modal_rule" role="basic"
+									aria-hidden="true">
+									<div class="modal-dialog">
+										<div class="modal-content">
+											<div class="modal-body">
+												<img th:src="@{/assets/global/img/loading-spinner-grey.gif}"
+													alt="" class="loading"> <span
+													th:text="#{modal_loading}"></span>
+											</div>
+										</div>
+									</div>
+								</div>
 				</div>
 			</div>
 		</div>
@@ -98,7 +94,7 @@
 			highlightCurrentUrl();
 			
 			$('#table_list').bootstrapTable({
-			      url: '/collect/urls',
+			      url: '/clean/rules',
 			      method: 'post',
 			      pagination: true,    
 	              sortable: true,     
@@ -114,10 +110,7 @@
 	                        offset: params.offset,  //页码
 	                        sort: params.sort,
 	                        order: params.order, 
-	                        url : $.trim($('#query_url').val()),
-	                        urlCategory : $.trim($('#query_url_category').val()),
-	                        urlCode : $.trim($('#query_url_code').val()),
-	                        status : $.trim($('#query_status').val())
+	                        dataCategory : $.trim($('#query_data_category').val())
 	                    };
 	                },
 	                // toolbar :'#toolbar',
@@ -126,38 +119,35 @@
 	                //Indicate which field is an identity field.
 	                idField : 'id',
 			      columns: [
-			    	  {
-				          	field: 'url',
-				          	title: [[#{url}]],
-				          	sortable: true,
-				          	formatter: urlFormatter
-				        },
 			        {
-			          	field: 'urlCategory',
-			          	title: [[#{category}]],
+			          	field: 'dataCategory',
+			          	title: [[#{data_category}]],
 			          	sortable: true,
 			          	width:200,
 			          	formatter: categoryFormatter
 			        },
 			        {
-			          	field: 'urlCode',
-			          	title: [[#{code}]],
-			          	sortable: true,
-			          	width:150
-			        },
-			        {
-			          	field: 'remark',
-			          	title: [[#{remark}]],
+			          	field: 'searchText',
+			          	title: [[#{search_text}]],
 			          	sortable: true
 			        },
-				    {
-				       	field: 'status',
-				       	title: [[#{status}]],
-				       	sortable: true,
-				       	width:80,
-				       	align: 'center',
-			          	formatter: statusFormatter
-				    }
+			        {
+			          	field: 'replaceText',
+			          	title: [[#{replace_text}]],
+			          	sortable: true
+			        },	
+			        {
+			          	field: 'priority',
+			          	title: [[#{priority}]],
+			          	sortable: true
+			        },
+				   	{
+					   	field: 'oper',
+					   	title: [[#{action}]],
+					   	width: 130,
+					   	align: 'center',
+					   	formatter: 'operateFormatter'
+					}
 			      ] 
 			    });
 			
@@ -165,21 +155,10 @@
 				 $('#table_list').bootstrapTable('refresh');
 				 return false;
 			});
-
-			setInterval(function(){
-				$('#table_list').bootstrapTable('refresh');
-			},20 * 1000);
 		});
-
-		
-
-		function urlFormatter(value, row, index){
-			return '<a href="' + value +'" target="_blank" >'
-			+ value + '</a>';
-		}
 		
 		function categoryFormatter(value, row, index){
-			$('#query_url_category option').each(function(){ 
+			$('#query_data_category option').each(function(){ 
 			    if($(this).val() == value){
 			    	value = $(this).text();
 			    	return;
@@ -189,48 +168,10 @@
 			return value;
 		}
 		
-		function statusFormatter(value, row, index){
-			$('#query_status option').each(function(){ 
-			    if($(this).val() == value){
-			    	value = $(this).text();
-			    	return;
-			    }
-			  });
-			
-			return value;
-		}
-		
-		function startCollect(){
-			if(!confirm([[#{confirm_collect}]])){
-				return;
-			}
-			$.ajax({
-				url : '/collect/start',
-				type : 'POST',
-				contentType : 'application/json',
-				cache : false,
-				datatype : 'json',
-				success : function(json) {
-					var alertType = 'danger';
-					var alertIcon = 'warning';
-					if (json.result) {
-					 	alertType = 'success';
-						alertIcon = 'check';
-					} 
-						App.alert({
-							container : '#action_alert',
-							place : 'prepend',
-							type : alertType,
-							message : json.message,
-							close : true,
-							reset : true,
-							focus : true,
-							closeInSeconds : 5,
-							icon : alertIcon
-						});
-				}
-			});
-		}
+		function operateFormatter(value, row, index) {
+			return '<a href="/clean/rule_' + row.id + '" data-target="#modal_rule" data-toggle="modal" class="btn btn-circle btn-icon-only btn-default" title="' + [[#{edit}]] +'"><i class="fa fa-pencil"></i></a>'
+				+ '<a href="javascript:;" class="btn btn-circle btn-icon-only btn-default" title="' + [[#{delete}]] +'"><i class="fa fa-remove"></i></a>';
+		} 
 		
 		/*]]>*/
 	</script>

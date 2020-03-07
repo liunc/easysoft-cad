@@ -296,9 +296,6 @@ public class CollectUrlServiceImpl implements CollectUrlService {
 
 		return this.collectUrlRepository.findAll(new Specification<CollectUrl>() {
 
-			/**
-			 * 
-			 */
 			private static final long serialVersionUID = -3950053446063792958L;
 
 			@Override

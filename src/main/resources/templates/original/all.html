@@ -7,14 +7,14 @@
 </th:block>
 <th:block th:fragment="page_title">
 	<h1 class="page-title">
-		<span th:text="#{url_list}"> </span> <small></small>
+		<span th:text="#{all_data}"> </span> <small></small>
 	</h1>
 </th:block>
 <div th:fragment="page_bar">
 	<ul class="page-breadcrumb">
 		<li><i class="icon-home"></i> <a href="/" th:text="#{homepage}"></a>
 			<i class="fa fa-angle-right"></i></li>
-		<li><span th:text="#{collect}"> </span></li>
+		<li><span th:text="#{original_data}"> </span></li>
 	</ul>
 </div>
 <th:block th:fragment="content">
@@ -25,43 +25,45 @@
 
 					<div id="action_alert"></div>
 					<div class="row">
-						<div class="col-md-8 col-sm-12">
+						<div class="col-md-9 col-sm-12">
 							<div class="form-inline">
 								<div class="form-group">
-									<label th:text="#{url}"> </label> <input id="query_url"
-										type="text" class="form-control input-sm"></input>
+									<label th:text="#{province}"> </label> <input
+										id="query_province_name" type="text"
+										class="form-control input-sm"></input>
 								</div>
 								<div class="form-group">
-									<label th:text="#{category}"> </label> <select
-										id="query_url_category" class="form-control input-sm">
-										<option value="" th:text="#{all}"></option>
-										<option th:each="category : ${categoryList}"
-											th:value="${category.key}" th:text="${category.value}"></option>
-									</select>
+									<label th:text="#{city}"> </label> <input
+										id="query_city_name" type="text"
+										class="form-control input-sm"></input>
 								</div>
 								<div class="form-group">
-									<label th:text="#{code}"> </label> <input id="query_url_code"
-										type="text" class="form-control input-sm"></input>
+									<label th:text="#{county}"> </label> <input
+										id="query_county_name" type="text"
+										class="form-control input-sm"></input>
 								</div>
 								<div class="form-group">
-									<label th:text="#{status}"></label> <select id="query_status"
-										class="form-control input-sm">
-										<option value="" th:text="#{all}"></option>
-										<option th:each="status : ${statusList}"
-											th:value="${status.key}" th:text="${status.value}"></option>
-									</select>
+									<label th:text="#{town}"> </label> <input
+										id="query_town_name" type="text"
+										class="form-control input-sm"></input>
+								</div>
+								<div class="form-group">
+									<label th:text="#{village}"> </label> <input
+										id="query_village_name" type="text"
+										class="form-control input-sm"></input>
 								</div>
 
 							</div>
 						</div>
-						<div class="col-md-4 col-sm-12" style="text-align: right">
+						<div class="col-md-3 col-sm-12" style="text-align: right">
 							<button id="btn_query" class="btn btn-success btn-sm">
 								<i class="fa fa-search"></i> <span th:text="#{search}"></span>
 							</button>
 
-							<a id="btn_collect" href="javascript:;" class="btn btn-info btn-sm" onclick="startCollect()" style="display: ${canCollect}">
-								<i class="fa fa-plus"></i> <span class="hidden-xs"
-								th:text="#{collect}"></span>
+							<a id="btn_collect" href="javascript:;"
+								class="btn btn-info btn-sm" onclick="startLoad()"> <i
+								class="icon-arrow-down"></i> <span class="hidden-xs"
+								th:text="#{load}"></span>
 							</a>
 						</div>
 					</div>
@@ -98,7 +100,7 @@
 			highlightCurrentUrl();
 			
 			$('#table_list').bootstrapTable({
-			      url: '/collect/urls',
+			      url: '/original/all',
 			      method: 'post',
 			      pagination: true,    
 	              sortable: true,     
@@ -114,50 +116,73 @@
 	                        offset: params.offset,  //页码
 	                        sort: params.sort,
 	                        order: params.order, 
-	                        url : $.trim($('#query_url').val()),
-	                        urlCategory : $.trim($('#query_url_category').val()),
-	                        urlCode : $.trim($('#query_url_code').val()),
-	                        status : $.trim($('#query_status').val())
+	                        provinceName : $.trim($('#query_province_name').val()),
+	                        cityName : $.trim($('#query_city_name').val()),
+	                        countyName : $.trim($('#query_county_name').val()),
+	                        townName : $.trim($('#query_town_name').val()),
+	                        villageName : $.trim($('#query_village_name').val())
 	                    };
 	                },
 	                // toolbar :'#toolbar',
 	                //Enable the strict search.    
 	                strictSearch: false,
 	                //Indicate which field is an identity field.
-	                idField : 'id',
-			      columns: [
+	                idField : 'villageCode',
+					columns: [
 			    	  {
-				          	field: 'url',
-				          	title: [[#{url}]],
-				          	sortable: true,
-				          	formatter: urlFormatter
-				        },
-			        {
-			          	field: 'urlCategory',
-			          	title: [[#{category}]],
-			          	sortable: true,
-			          	width:200,
-			          	formatter: categoryFormatter
-			        },
-			        {
-			          	field: 'urlCode',
-			          	title: [[#{code}]],
-			          	sortable: true,
-			          	width:150
-			        },
-			        {
-			          	field: 'remark',
-			          	title: [[#{remark}]],
+			          	field: 'provinceCode',
+			          	title: [[#{stats_code}]],
 			          	sortable: true
-			        },
-				    {
-				       	field: 'status',
-				       	title: [[#{status}]],
-				       	sortable: true,
-				       	width:80,
-				       	align: 'center',
-			          	formatter: statusFormatter
-				    }
+			        	},
+			    	  {
+				          	field: 'provinceName',
+				          	title: [[#{province}]],
+				          	sortable: true
+				        },{
+				          	field: 'cityCode',
+				          	title: [[#{stats_code}]],
+				          	sortable: true
+				        	},
+				        {
+				          	field: 'cityName',
+				          	title: [[#{city}]],
+				          	sortable: true
+				        },{
+				          	field: 'countyCode',
+				          	title: [[#{stats_code}]],
+				          	sortable: true
+				        	},
+				        {
+				          	field: 'countyName',
+				          	title: [[#{county}]],
+				          	sortable: true
+				        },
+				        {
+				          	field: 'townCode',
+				          	title: [[#{stats_code}]],
+				          	sortable: true
+				        	},
+				        {
+				          	field: 'townName',
+				          	title: [[#{town}]],
+				          	sortable: true
+				        },
+				        
+				        {
+				          	field: 'villageCode',
+				          	title: [[#{stats_code}]],
+				          	sortable: true
+				        },
+				        {
+				          	field: 'villageCategory',
+				          	title: [[#{category}]],
+				          	sortable: true
+				        },
+				        {
+				          	field: 'villageName',
+				          	title: [[#{village}]],
+				          	sortable: true
+				        }
 			      ] 
 			    });
 			
@@ -170,42 +195,13 @@
 				$('#table_list').bootstrapTable('refresh');
 			},20 * 1000);
 		});
-
-		
-
-		function urlFormatter(value, row, index){
-			return '<a href="' + value +'" target="_blank" >'
-			+ value + '</a>';
-		}
-		
-		function categoryFormatter(value, row, index){
-			$('#query_url_category option').each(function(){ 
-			    if($(this).val() == value){
-			    	value = $(this).text();
-			    	return;
-			    }
-			  });
-			
-			return value;
-		}
-		
-		function statusFormatter(value, row, index){
-			$('#query_status option').each(function(){ 
-			    if($(this).val() == value){
-			    	value = $(this).text();
-			    	return;
-			    }
-			  });
-			
-			return value;
-		}
-		
-		function startCollect(){
-			if(!confirm([[#{confirm_collect}]])){
+ 
+		function startLoad(){
+			if(!confirm([[#{confirm_load}]])){
 				return;
 			}
 			$.ajax({
-				url : '/collect/start',
+				url : '/original/load/all',
 				type : 'POST',
 				contentType : 'application/json',
 				cache : false,
