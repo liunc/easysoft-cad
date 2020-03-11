@@ -43,7 +43,7 @@ public class CollectController {
 	public String index(Model model) {
 
 		boolean canCollect = this.collectUrlService.canCollect();
-		model.addAttribute("canCollect", canCollect ? "display" : "none");
+		model.addAttribute("canCollect", canCollect);
 
 		Map<String, String> categoryList = new HashMap<String, String>();
 		for (String category : UrlCategory.list()) {

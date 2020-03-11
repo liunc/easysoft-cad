@@ -1,7 +1,7 @@
 package com.easysoft.cad.infrastructure.repository;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.repository.PagingAndSortingRepository;
 
 import com.easysoft.cad.domain.entity.CleanRule;
 
@@ -10,7 +10,7 @@ import com.easysoft.cad.domain.entity.CleanRule;
  * 
  * @author 刘年超
  */
-public interface CleanRuleRepository extends PagingAndSortingRepository<CleanRule, String>, JpaSpecificationExecutor<CleanRule> {
+public interface CleanRuleRepository extends JpaRepository<CleanRule, String>, JpaSpecificationExecutor<CleanRule> {
 	
 	public boolean existsByDataCategoryAndSearchText(String dataCategory, String searchText);
 

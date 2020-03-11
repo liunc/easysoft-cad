@@ -30,9 +30,6 @@ public class CleanSchemeRule {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "scheme_id")
 	private CleanScheme scheme;
-	
-	@Column(name = "priority")
-	private int priority;
 
 	public String getId() {
 		return id;
@@ -46,15 +43,10 @@ public class CleanSchemeRule {
 		return scheme;
 	}
 
-	public int getPriority() {
-		return priority;
-	}
-
-	public void create(CleanScheme scheme, CleanRule rule, int priority) {
+	public void create(CleanScheme scheme, CleanRule rule) {
 		this.id = UUID.randomUUID().toString().replaceAll("-", "");
 		this.scheme = scheme;
 		this.rule = rule;
-		this.priority = priority;
 	}
 
 }

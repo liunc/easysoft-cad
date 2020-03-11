@@ -80,10 +80,10 @@ public class DataAutoCompleteServiceImpl implements DataAutoCompleteService {
 
 	@Override
 	public void loadData() {
-		 
+		 /*
 		long count = this.dataAutoCompleteRepository.count();
 		if (count != 0) {
-			this.dataAutoCompleteRepository.deleteAll();
+			this.dataAutoCompleteRepository.deleteAllInBatch();
 		}
 		count = this.originalVillageRepository.count();
 
@@ -92,7 +92,7 @@ public class DataAutoCompleteServiceImpl implements DataAutoCompleteService {
 		if (count % size > 0) {
 			page += 1;
 		}
-this.originalProvinceRepository.
+
 		for (int i = 0; i < page; i++) {
 			Page<OriginalVillage> villages = this.originalVillageRepository.findAll(PageRequest.of(i, size));
 			List<DataAutoComplete> entities = new ArrayList<DataAutoComplete>();
@@ -149,7 +149,7 @@ this.originalProvinceRepository.
 			}
 			this.originalAllRepository.saveAll(entities);
 		}
-		
+		*/
 	}
 
 	@Override

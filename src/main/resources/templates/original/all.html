@@ -33,9 +33,8 @@
 										class="form-control input-sm"></input>
 								</div>
 								<div class="form-group">
-									<label th:text="#{city}"> </label> <input
-										id="query_city_name" type="text"
-										class="form-control input-sm"></input>
+									<label th:text="#{city}"> </label> <input id="query_city_name"
+										type="text" class="form-control input-sm"></input>
 								</div>
 								<div class="form-group">
 									<label th:text="#{county}"> </label> <input
@@ -43,9 +42,8 @@
 										class="form-control input-sm"></input>
 								</div>
 								<div class="form-group">
-									<label th:text="#{town}"> </label> <input
-										id="query_town_name" type="text"
-										class="form-control input-sm"></input>
+									<label th:text="#{town}"> </label> <input id="query_town_name"
+										type="text" class="form-control input-sm"></input>
 								</div>
 								<div class="form-group">
 									<label th:text="#{village}"> </label> <input
@@ -61,9 +59,15 @@
 							</button>
 
 							<a id="btn_collect" href="javascript:;"
-								class="btn btn-info btn-sm" onclick="startLoad()"> <i
+								class="btn btn-info btn-sm" onclick="startImport()"> <i
 								class="icon-arrow-down"></i> <span class="hidden-xs"
-								th:text="#{load}"></span>
+								th:text="#{import}"></span>
+							</a>
+							
+							<a id="btn_export" href="javascript:;"
+								class="btn btn-info btn-sm" onclick="startExport()"> <i
+								class="icon-arrow-up"></i> <span class="hidden-xs"
+								th:text="#{export}"></span>
 							</a>
 						</div>
 					</div>
@@ -196,12 +200,41 @@
 			},20 * 1000);
 		});
  
-		function startLoad(){
-			if(!confirm([[#{confirm_load}]])){
+		function startImport(){
+			if(!confirm([[#{confirm_import}]])){
 				return;
 			}
 			$.ajax({
-				url : '/original/load/all',
+				url : '/original/import/all',
+				type : 'POST',
+				contentType : 'application/json',
+				cache : false,
+				datatype : 'json',
+				success : function(json) {
+					var alertType = 'danger';
+					var alertIcon = 'warning';
+					if (json.result) {
+					 	alertType = 'success';
+						alertIcon = 'check';
+					} 
+						App.alert({
+							container : '#action_alert',
+							place : 'prepend',
+							type : alertType,
+							message : json.message,
+							close : true,
+							reset : true,
+							focus : true,
+							closeInSeconds : 5,
+							icon : alertIcon
+						});
+				}
+			});
+		}
+		
+		function startExport(){
+			$.ajax({
+				url : '/original/export/all',
 				type : 'POST',
 				contentType : 'application/json',
 				cache : false,

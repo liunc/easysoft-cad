@@ -1,7 +1,7 @@
 package com.easysoft.cad.infrastructure.repository;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.repository.PagingAndSortingRepository;
 
 import com.easysoft.cad.domain.entity.OriginalVillage;
 
@@ -10,7 +10,7 @@ import com.easysoft.cad.domain.entity.OriginalVillage;
  * 
  * @author 刘年超
  */
-public interface OriginalVillageRepository extends PagingAndSortingRepository<OriginalVillage, String>, JpaSpecificationExecutor<OriginalVillage> {
+public interface OriginalVillageRepository extends JpaRepository<OriginalVillage, String>, JpaSpecificationExecutor<OriginalVillage> {
 
 	public OriginalVillage findByCode(String code);
 }

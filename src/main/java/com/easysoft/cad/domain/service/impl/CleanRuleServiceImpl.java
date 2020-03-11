@@ -13,11 +13,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.easysoft.cad.domain.entity.CleanRule;
 import com.easysoft.cad.domain.service.CleanRuleService;
 import com.easysoft.cad.infrastructure.repository.CleanRuleRepository;
+import com.easysoft.cad.infrastructure.repository.CleanSchemeRuleRepository;
 import com.easysoft.core.util.EasysoftException;
 import com.easysoft.core.util.EasysoftMessageSource;
 
@@ -26,6 +28,10 @@ public class CleanRuleServiceImpl implements CleanRuleService {
 
 	@Autowired
 	private CleanRuleRepository cleanRuleRepository;
+	
+	@Autowired
+	private CleanSchemeRuleRepository cleanSchemeRuleRepository;
+	
 
 	@Autowired
 	private EasysoftMessageSource messageSource;
@@ -87,9 +93,11 @@ public class CleanRuleServiceImpl implements CleanRuleService {
 	}
 
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public void delete(String id) throws EasysoftException {
 		
-
+		this.cleanSchemeRuleRepository.deleteByRuleId(id);
+		this.cleanRuleRepository.deleteById(id);
 	}
 
 	@Override

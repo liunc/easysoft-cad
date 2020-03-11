@@ -59,7 +59,7 @@
 								<i class="fa fa-search"></i> <span th:text="#{search}"></span>
 							</button>
 
-							<a id="btn_collect" href="javascript:;" class="btn btn-info btn-sm" onclick="startCollect()" style="display: ${canCollect}">
+							<a th:if="${canCollect}" id="btn_collect" href="javascript:;" class="btn btn-info btn-sm" onclick="startCollect()">
 								<i class="fa fa-plus"></i> <span class="hidden-xs"
 								th:text="#{collect}"></span>
 							</a>

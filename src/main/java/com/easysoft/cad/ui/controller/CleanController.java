@@ -153,4 +153,21 @@ public class CleanController {
 		}
 		return response;
 	}
+	
+	@RequestMapping(value = "/rule/delete", method = RequestMethod.POST)
+	@ResponseBody
+	public AjaxResponse ruleDelete(@RequestBody String id) {
+
+		AjaxResponse response = new AjaxResponse();
+		try {
+			this.cleanRuleService.delete(id);
+			response.setResult(true);
+			response.setMessage(this.messageSource.getMessage("delete_success"));
+		} catch (Exception ex) {
+			logger.error(ex.toString());
+			response.setResult(false);
+			response.setMessage(this.messageSource.getMessage("delete_failed", new Object[] { ex.getMessage() }));
+		}
+		return response;
+	}
 }

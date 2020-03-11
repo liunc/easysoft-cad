@@ -1,5 +1,9 @@
 package com.easysoft.cad.domain.service.impl;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,6 +12,12 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -36,6 +46,8 @@ import com.easysoft.core.util.EasysoftMessageSource;
 @Service
 public class OriginalDataServiceImpl implements OriginalDataService {
 
+	private static final Logger logger = LoggerFactory.getLogger(OriginalDataServiceImpl.class);
+
 	@Autowired
 	private OriginalProvinceRepository originalProvinceRepository;
 
@@ -60,11 +72,8 @@ public class OriginalDataServiceImpl implements OriginalDataService {
 	@Override
 	public Page<OriginalProvince> findProvinces(String code, String name, Pageable pageable) {
 
-		return this.originalProvinceRepository.(new Specification<OriginalProvince>() {
+		return this.originalProvinceRepository.findAll(new Specification<OriginalProvince>() {
 
-			/**
-			 * 
-			 */
 			private static final long serialVersionUID = -3950053446063792958L;
 
 			@Override
@@ -95,9 +104,6 @@ public class OriginalDataServiceImpl implements OriginalDataService {
 	public Page<OriginalCity> findCities(String provinceCode, String code, String name, Pageable pageable) {
 		return this.originalCityRepository.findAll(new Specification<OriginalCity>() {
 
-			/**
-			 * 
-			 */
 			private static final long serialVersionUID = -3950053446063792958L;
 
 			@Override
@@ -132,9 +138,6 @@ public class OriginalDataServiceImpl implements OriginalDataService {
 	public Page<OriginalCounty> findCounties(String cityCode, String code, String name, Pageable pageable) {
 		return this.originalCountyRepository.findAll(new Specification<OriginalCounty>() {
 
-			/**
-			 * 
-			 */
 			private static final long serialVersionUID = -3950053446063792958L;
 
 			@Override
@@ -172,9 +175,6 @@ public class OriginalDataServiceImpl implements OriginalDataService {
 	public Page<OriginalTown> findTowns(String countyCode, String code, String name, Pageable pageable) {
 		return this.originalTownRepository.findAll(new Specification<OriginalTown>() {
 
-			/**
-			 * 
-			 */
 			private static final long serialVersionUID = -3950053446063792958L;
 
 			@Override
@@ -213,9 +213,6 @@ public class OriginalDataServiceImpl implements OriginalDataService {
 	public Page<OriginalVillage> findVillages(String townCode, String code, String name, Pageable pageable) {
 		return this.originalVillageRepository.findAll(new Specification<OriginalVillage>() {
 
-			/**
-			 * 
-			 */
 			private static final long serialVersionUID = -3950053446063792958L;
 
 			@Override
@@ -342,10 +339,10 @@ public class OriginalDataServiceImpl implements OriginalDataService {
 
 	@Async("taskExecutor")
 	@Override
-	public void loadDataToAll() {
+	public void importToAll() {
 		long count = this.originalAllRepository.count();
 		if (count != 0) {
-			this.originalAllRepository.deleteAll();
+			this.originalAllRepository.deleteAllInBatch();
 		}
 		count = this.originalVillageRepository.count();
 
@@ -412,14 +409,12 @@ public class OriginalDataServiceImpl implements OriginalDataService {
 			this.originalAllRepository.saveAll(entities);
 		}
 	}
-	
+
 	@Override
-	public Page<OriginalAll> findAll(String provinceName, String cityName, String countyName, String townName, String villageName, Pageable pageable) {
+	public Page<OriginalAll> findAll(String provinceName, String cityName, String countyName, String townName,
+			String villageName, Pageable pageable) {
 		return this.originalAllRepository.findAll(new Specification<OriginalAll>() {
 
-			/**
-			 * 
-			 */
 			private static final long serialVersionUID = -3950053446063792958L;
 
 			@Override
@@ -435,15 +430,15 @@ public class OriginalDataServiceImpl implements OriginalDataService {
 				if (StringUtils.hasText(cityName)) {
 					list.add(criteriaBuilder.like(root.get("cityName").as(String.class), "%" + cityName + "%"));
 				}
-				
+
 				if (StringUtils.hasText(countyName)) {
 					list.add(criteriaBuilder.like(root.get("countyName").as(String.class), "%" + countyName + "%"));
 				}
-				
+
 				if (StringUtils.hasText(townName)) {
 					list.add(criteriaBuilder.like(root.get("townName").as(String.class), "%" + townName + "%"));
 				}
-				
+
 				if (StringUtils.hasText(villageName)) {
 					list.add(criteriaBuilder.like(root.get("villageName").as(String.class), "%" + villageName + "%"));
 				}
@@ -456,5 +451,37 @@ public class OriginalDataServiceImpl implements OriginalDataService {
 				return null;
 			}
 		}, pageable);
+	}
+
+	//@Async("taskExecutor")
+	@Override
+	public void exportAll(String exportPath) {
+
+		try {
+			logger.info(exportPath);
+			// HSSFWorkbook wb1 = new HSSFWorkbook();
+			@SuppressWarnings("resource")
+			XSSFWorkbook workbook = new XSSFWorkbook();
+			XSSFSheet sheets = workbook.createSheet("九九乘法表");
+			for (int i = 1; i <= 9; i++) {
+				XSSFRow row = sheets.createRow(i - 1);
+				for (int j = 1; j <= 9; j++) {
+					XSSFCell cell = row.createCell(j - 1);
+					cell.setCellValue(i + "*" + j + "=" + i * j);
+				}
+
+			}
+			exportPath += "\\export";
+			File file = new File(exportPath);
+			if(!file.exists()) {
+				file.mkdirs();
+			}
+			FileOutputStream fileOutputStream = new FileOutputStream(exportPath +"\\test2.xlsx");
+
+			workbook.write(fileOutputStream);
+
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		} 
 	}
 }

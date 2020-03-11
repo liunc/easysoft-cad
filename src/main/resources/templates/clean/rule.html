@@ -170,9 +170,42 @@
 		
 		function operateFormatter(value, row, index) {
 			return '<a href="/clean/rule_' + row.id + '" data-target="#modal_rule" data-toggle="modal" class="btn btn-circle btn-icon-only btn-default" title="' + [[#{edit}]] +'"><i class="fa fa-pencil"></i></a>'
-				+ '<a href="javascript:;" class="btn btn-circle btn-icon-only btn-default" title="' + [[#{delete}]] +'"><i class="fa fa-remove"></i></a>';
+				+ '<a href="javascript:;" class="btn btn-circle btn-icon-only btn-default" onclick="deleteRule(\'' + row.id + '\')" title="' + [[#{delete}]] +'"><i class="fa fa-remove"></i></a>';
 		} 
 		
+		function deleteRule(id){
+			if(!confirm([[#{confirm_delete}]])){
+				return;
+			}
+			$.ajax({
+				url : '/clean/rule/delete',
+				type : 'POST',
+				contentType : 'application/json',
+				cache : false,
+				datatype : 'json',
+				data : id,
+				success : function(json) {
+					var alertType = 'danger';
+					var alertIcon = 'warning';
+					if (json.result) {
+					 	alertType = 'success';
+						alertIcon = 'check';
+						$('#table_list').bootstrapTable('refresh');
+					} 
+					App.alert({
+						container : '#action_alert',
+						place : 'prepend',
+						type : alertType,
+						message : json.message,
+						close : true,
+						reset : true,
+						focus : true,
+						closeInSeconds : 5,
+						icon : alertIcon
+					});
+				}
+			});
+		}
 		/*]]>*/
 	</script>
 </th:block>

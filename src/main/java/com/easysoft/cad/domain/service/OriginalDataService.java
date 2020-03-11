@@ -43,7 +43,9 @@ public interface OriginalDataService {
 	
 	public void updateVillage(String code, String name) throws EasysoftException;
 	
-	public void loadDataToAll();
+	public void importToAll();
 	
 	public Page<OriginalAll> findAll(String provinceName, String cityName, String countyName, String townName, String villageName, Pageable pageable);
+	
+	public void exportAll(String exportPath);
 }

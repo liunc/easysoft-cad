@@ -1,10 +1,13 @@
 package com.easysoft.cad.ui.controller;
 
+import java.io.File;
+
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.system.ApplicationHome;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -476,14 +479,14 @@ public class OriginalDataController {
 		return response;
 	}
 
-	@RequestMapping(value = "/load/all", method = RequestMethod.POST)
+	@RequestMapping(value = "/import/all", method = RequestMethod.POST)
 	@ResponseBody
-	public AjaxResponse loadAll() {
+	public AjaxResponse importAll() {
 
 		AjaxResponse response = new AjaxResponse();
 
 		try {
-			this.originalDataService.loadDataToAll();
+			this.originalDataService.importToAll();
 			response.setMessage(this.messageSource.getMessage("action_success"));
 			response.setResult(true);
 
@@ -493,4 +496,26 @@ public class OriginalDataController {
 		}
 		return response;
 	}
+	
+	@RequestMapping(value = "/export/all", method = RequestMethod.POST)
+	@ResponseBody
+	public AjaxResponse exportAll() {
+
+		AjaxResponse response = new AjaxResponse();
+
+		try {
+			ApplicationHome h = new ApplicationHome(getClass());
+	        File jarF = h.getSource();
+			this.originalDataService.exportAll(jarF.getParentFile().toString());
+			response.setMessage(this.messageSource.getMessage("action_success"));
+			response.setResult(true);
+
+		} catch (Exception ex) {
+			logger.error(ex.toString());
+			response.setMessage(this.messageSource.getMessage("action_failed", new Object[] { ex.getMessage() }));
+		}
+		return response;
+	}
+	
+	
 }
