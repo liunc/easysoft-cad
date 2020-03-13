@@ -58,15 +58,13 @@
 								<i class="fa fa-search"></i> <span th:text="#{search}"></span>
 							</button>
 
-							<a id="btn_collect" href="javascript:;"
+							<a th:if="${canImport}" id="btn_import" href="javascript:;"
 								class="btn btn-info btn-sm" onclick="startImport()"> <i
-								class="icon-arrow-down"></i> <span class="hidden-xs"
+								class="glyphicon glyphicon-import"></i> <span class="hidden-xs"
 								th:text="#{import}"></span>
-							</a>
-							
-							<a id="btn_export" href="javascript:;"
+							</a> <a id="btn_export" href="javascript:;"
 								class="btn btn-info btn-sm" onclick="startExport()"> <i
-								class="icon-arrow-up"></i> <span class="hidden-xs"
+								class="glyphicon glyphicon-export"></i> <span class="hidden-xs"
 								th:text="#{export}"></span>
 							</a>
 						</div>
@@ -104,100 +102,103 @@
 			highlightCurrentUrl();
 			
 			$('#table_list').bootstrapTable({
-			      url: '/original/all',
-			      method: 'post',
-			      pagination: true,    
-	              sortable: true,     
-	              sortOrder: 'asc', 
-			      striped: true,
-			      pageSize: 25,   
-	              pageList: [10, 25, 50, 100],
-	              sidePagination: 'server', 
-	              search: false,  
-	              queryParams : function (params) {
-	                	return {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
-	                        limit: params.limit,   //页面大小
-	                        offset: params.offset,  //页码
-	                        sort: params.sort,
-	                        order: params.order, 
-	                        provinceName : $.trim($('#query_province_name').val()),
-	                        cityName : $.trim($('#query_city_name').val()),
-	                        countyName : $.trim($('#query_county_name').val()),
-	                        townName : $.trim($('#query_town_name').val()),
-	                        villageName : $.trim($('#query_village_name').val())
-	                    };
-	                },
-	                // toolbar :'#toolbar',
-	                //Enable the strict search.    
-	                strictSearch: false,
-	                //Indicate which field is an identity field.
-	                idField : 'villageCode',
-					columns: [
-			    	  {
-			          	field: 'provinceCode',
+				url: '/original/all',
+			  	method: 'post',
+			   	pagination: true,    
+	           	sortable: true,     
+	          	sortOrder: 'asc', 
+			   	striped: true,
+			   	pageSize: 25,   
+	        	pageList: [10, 25, 50, 100],
+	            sidePagination: 'server', 
+	            search: false,  
+	            queryParams : function (params) {
+	               	return {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+	                   	limit: params.limit,   //页面大小
+	                   	offset: params.offset,  //页码
+	                   	sort: params.sort,
+	                   	order: params.order, 
+	                   	provinceName : $.trim($('#query_province_name').val()),
+	                    cityName : $.trim($('#query_city_name').val()),
+	                    countyName : $.trim($('#query_county_name').val()),
+	                    townName : $.trim($('#query_town_name').val()),
+	                    villageName : $.trim($('#query_village_name').val())
+	              	};
+	          	},
+	            // toolbar :'#toolbar',
+	            //Enable the strict search.    
+	          	strictSearch: false,
+	          	//Indicate which field is an identity field.
+	         	idField : 'villageCode',
+				columns: [
+			    	{
+			       		field: 'provinceCode',
 			          	title: [[#{stats_code}]],
 			          	sortable: true
-			        	},
-			    	  {
-				          	field: 'provinceName',
-				          	title: [[#{province}]],
-				          	sortable: true
-				        },{
-				          	field: 'cityCode',
-				          	title: [[#{stats_code}]],
-				          	sortable: true
-				        	},
-				        {
-				          	field: 'cityName',
-				          	title: [[#{city}]],
-				          	sortable: true
-				        },{
-				          	field: 'countyCode',
-				          	title: [[#{stats_code}]],
-				          	sortable: true
-				        	},
-				        {
-				          	field: 'countyName',
-				          	title: [[#{county}]],
-				          	sortable: true
-				        },
-				        {
-				          	field: 'townCode',
-				          	title: [[#{stats_code}]],
-				          	sortable: true
-				        	},
-				        {
-				          	field: 'townName',
-				          	title: [[#{town}]],
-				          	sortable: true
-				        },
-				        
-				        {
-				          	field: 'villageCode',
-				          	title: [[#{stats_code}]],
-				          	sortable: true
-				        },
-				        {
-				          	field: 'villageCategory',
-				          	title: [[#{category}]],
-				          	sortable: true
-				        },
-				        {
-				          	field: 'villageName',
-				          	title: [[#{village}]],
-				          	sortable: true
-				        }
-			      ] 
-			    });
+			     	},
+			    	{
+				     	field: 'provinceName',
+				      	title: [[#{province}]],
+				       	sortable: true
+				   	},
+				   	{
+				   		field: 'cityCode',
+				       	title: [[#{stats_code}]],
+				       	sortable: true
+				   	},
+				  	{
+				      	field: 'cityName',
+				       	title: [[#{city}]],
+				      	sortable: true
+				   	},
+				   	{
+				     	field: 'countyCode',
+				      	title: [[#{stats_code}]],
+				     	sortable: true
+				    },
+				  	{
+				      	field: 'countyName',
+				       	title: [[#{county}]],
+				       	sortable: true
+				   	},
+				  	{
+				      	field: 'townCode',
+				      	title: [[#{stats_code}]],
+				      	sortable: true
+				  	},
+				  	{
+				      	field: 'townName',
+				      	title: [[#{town}]],
+				     	sortable: true
+				   	},
+				    {
+				      	field: 'villageCode',
+				     	title: [[#{stats_code}]],
+				      	sortable: true
+				  	},
+				  	{
+				      	field: 'villageCategory',
+				      	title: [[#{city_or_country_category}]],
+				    	sortable: true
+					},
+				  	{
+				     	field: 'villageName',
+				      	title: [[#{village}]],
+				     	sortable: true
+				 	}
+			 	] 
+			});
 			
 			$('#btn_query').click(function(){
 				 $('#table_list').bootstrapTable('refresh');
 				 return false;
 			});
-
-			setInterval(function(){
-				$('#table_list').bootstrapTable('refresh');
-			},20 * 1000);
+			
+			if($('#btn_import').length){
+				setInterval(function(){
+					$('#table_list').bootstrapTable('refresh');
+				},20 * 1000);
+			}
 		});
  
 		function startImport(){
@@ -217,48 +218,80 @@
 					 	alertType = 'success';
 						alertIcon = 'check';
 					} 
-						App.alert({
-							container : '#action_alert',
-							place : 'prepend',
-							type : alertType,
-							message : json.message,
-							close : true,
-							reset : true,
-							focus : true,
-							closeInSeconds : 5,
-							icon : alertIcon
-						});
+					App.alert({
+						container : '#action_alert',
+						place : 'prepend',
+						type : alertType,
+						message : json.message,
+						close : true,
+						reset : true,
+						focus : true,
+						closeInSeconds : 5,
+						icon : alertIcon
+					});
 				}
 			});
 		}
 		
 		function startExport(){
+			
+			var request = {};
+			request.provinceName = $.trim($('#query_province_name').val());
+			request.cityName = $.trim($('#query_city_name').val());
+			request.countyName = $.trim($('#query_county_name').val());
+			request.townName = $.trim($('#query_town_name').val());
+			request.villageName = $.trim($('#query_village_name').val());
+			
 			$.ajax({
 				url : '/original/export/all',
 				type : 'POST',
+				data : JSON.stringify(request),
 				contentType : 'application/json',
 				cache : false,
 				datatype : 'json',
+				beforeSend : function(){
+					 App.blockUI({
+		 	                boxed: !0,
+							message: "Processing..."
+		 	            }),
+		 	            window.setTimeout(function() {
+		 	                App.unblockUI()
+		 	            },
+		 	            2e3)
+		 	        },
 				success : function(json) {
-					var alertType = 'danger';
-					var alertIcon = 'warning';
 					if (json.result) {
-					 	alertType = 'success';
-						alertIcon = 'check';
+						window.location.href = '/file/download/'+ json.data;
 					} 
+					else{
 						App.alert({
 							container : '#action_alert',
 							place : 'prepend',
-							type : alertType,
+							type : 'danger',
 							message : json.message,
 							close : true,
 							reset : true,
 							focus : true,
 							closeInSeconds : 5,
-							icon : alertIcon
+							icon : 'warning'
 						});
+					}
 				}
 			});
+			
+			
+// 			$("#blockui_sample_2_2").click(function() {
+// 	            App.blockUI({
+// 	                boxed: !0,
+//					message: "Processing..."
+// 	            }),
+// 	            window.setTimeout(function() {
+// 	                App.unblockUI()
+// 	            },
+// 	            2e3)
+// 	        })
+			
+			
 		}
 		
 		/*]]>*/

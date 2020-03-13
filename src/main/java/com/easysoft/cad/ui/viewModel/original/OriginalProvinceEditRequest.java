@@ -1,9 +1,9 @@
-package com.easysoft.cad.ui.viewModel.data;
+package com.easysoft.cad.ui.viewModel.original;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-public class OriginalVillageEditRequest {
+public class OriginalProvinceEditRequest {
 
 	@NotBlank(message = "{code}{validator_required}")
 	private String code;

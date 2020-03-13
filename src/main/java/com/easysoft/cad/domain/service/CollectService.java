@@ -5,7 +5,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.easysoft.cad.domain.entity.CollectUrl;
 
-public interface CollectUrlService {
+public interface CollectService {
 
 	public void collect();
 	

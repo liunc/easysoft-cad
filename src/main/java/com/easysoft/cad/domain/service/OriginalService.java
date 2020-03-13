@@ -11,7 +11,7 @@ import com.easysoft.cad.domain.entity.OriginalTown;
 import com.easysoft.cad.domain.entity.OriginalVillage;
 import com.easysoft.core.util.EasysoftException;
 
-public interface OriginalDataService {
+public interface OriginalService {
 
 	public Page<OriginalProvince> findProvinces(String code, String name, Pageable pageable);
 
@@ -43,9 +43,12 @@ public interface OriginalDataService {
 	
 	public void updateVillage(String code, String name) throws EasysoftException;
 	
+	public boolean canImport();
+	
 	public void importToAll();
 	
 	public Page<OriginalAll> findAll(String provinceName, String cityName, String countyName, String townName, String villageName, Pageable pageable);
 	
-	public void exportAll(String exportPath);
+	public String exportAll(String provinceName, String cityName, String countyName, String townName,
+			String villageName);
 }

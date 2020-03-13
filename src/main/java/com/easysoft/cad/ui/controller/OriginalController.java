@@ -1,13 +1,10 @@
 package com.easysoft.cad.ui.controller;
 
-import java.io.File;
-
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.system.ApplicationHome;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,19 +26,9 @@ import com.easysoft.cad.domain.entity.OriginalCounty;
 import com.easysoft.cad.domain.entity.OriginalProvince;
 import com.easysoft.cad.domain.entity.OriginalTown;
 import com.easysoft.cad.domain.entity.OriginalVillage;
-import com.easysoft.cad.domain.service.CollectUrlService;
-import com.easysoft.cad.domain.service.OriginalDataService;
-import com.easysoft.cad.ui.viewModel.data.OriginalAllPageRequest;
-import com.easysoft.cad.ui.viewModel.data.OriginalCityEditRequest;
-import com.easysoft.cad.ui.viewModel.data.OriginalCityPageRequest;
-import com.easysoft.cad.ui.viewModel.data.OriginalCountyEditRequest;
-import com.easysoft.cad.ui.viewModel.data.OriginalCountyPageRequest;
-import com.easysoft.cad.ui.viewModel.data.OriginalProvinceEditRequest;
-import com.easysoft.cad.ui.viewModel.data.OriginalProvincePageRequest;
-import com.easysoft.cad.ui.viewModel.data.OriginalTownEditRequest;
-import com.easysoft.cad.ui.viewModel.data.OriginalTownPageRequest;
-import com.easysoft.cad.ui.viewModel.data.OriginalVillageEditRequest;
-import com.easysoft.cad.ui.viewModel.data.OriginalVillagePageRequest;
+import com.easysoft.cad.domain.service.CollectService;
+import com.easysoft.cad.domain.service.OriginalService;
+import com.easysoft.cad.ui.viewModel.original.*;
 import com.easysoft.core.util.EasysoftException;
 import com.easysoft.core.util.EasysoftMessageSource;
 import com.easysoft.core.web.viewModel.AjaxResponse;
@@ -49,15 +36,15 @@ import com.easysoft.core.web.viewModel.BootstrapTableResponse;
 
 @Controller
 @RequestMapping("/original")
-public class OriginalDataController {
+public class OriginalController {
 
-	private static final Logger logger = LoggerFactory.getLogger(OriginalDataController.class);
-
-	@Autowired
-	private OriginalDataService originalDataService;
+	private static final Logger logger = LoggerFactory.getLogger(OriginalController.class);
 
 	@Autowired
-	private CollectUrlService collectUrlService;
+	private OriginalService originalService;
+
+	@Autowired
+	private CollectService collectService;
 
 	@Autowired
 	private EasysoftMessageSource messageSource;
@@ -79,7 +66,7 @@ public class OriginalDataController {
 					request.isDesc() ? Direction.DESC : Direction.ASC, request.getSort());
 		}
 
-		Page<OriginalProvince> entities = this.originalDataService.findProvinces(request.getCode(), request.getName(),
+		Page<OriginalProvince> entities = this.originalService.findProvinces(request.getCode(), request.getName(),
 				pageable);
 		if (entities == null || entities.getTotalElements() == 0) {
 			return response;
@@ -93,7 +80,7 @@ public class OriginalDataController {
 	@RequestMapping("/province_{code}")
 	public String provinceEdit(Model model, @PathVariable String code) {
 		try {
-			OriginalProvince entity = this.originalDataService.findProvince(code);
+			OriginalProvince entity = this.originalService.findProvince(code);
 			model.addAttribute("vm", entity);
 			return "original/province_edit";
 		} catch (EasysoftException e) {
@@ -112,7 +99,7 @@ public class OriginalDataController {
 
 		if (response.isResult()) {
 			try {
-				this.originalDataService.updateProvince(request.getCode(), request.getName());
+				this.originalService.updateProvince(request.getCode(), request.getName());
 				response.setMessage(this.messageSource.getMessage("edit_success"));
 
 			} catch (EasysoftException ex) {
@@ -132,8 +119,8 @@ public class OriginalDataController {
 		OriginalProvince province = null;
 		String collectUrl = "";
 		try {
-			province = this.originalDataService.findProvince(provinceCode);
-			collectUrl = this.collectUrlService.getUrl(provinceCode);
+			province = this.originalService.findProvince(provinceCode);
+			collectUrl = this.collectService.getUrl(provinceCode);
 		} catch (EasysoftException e) {
 			logger.error(e.toString());
 			model.addAttribute("error", e.getMessage());
@@ -156,7 +143,7 @@ public class OriginalDataController {
 					request.isDesc() ? Direction.DESC : Direction.ASC, request.getSort());
 		}
 
-		Page<OriginalCity> entities = this.originalDataService.findCities(request.getProvinceCode(), request.getCode(),
+		Page<OriginalCity> entities = this.originalService.findCities(request.getProvinceCode(), request.getCode(),
 				request.getName(), pageable);
 		if (entities == null || entities.getTotalElements() == 0) {
 			return response;
@@ -170,7 +157,7 @@ public class OriginalDataController {
 	@RequestMapping("/city_{code}")
 	public String cityEdit(Model model, @PathVariable String code) {
 		try {
-			OriginalCity entity = this.originalDataService.findCity(code);
+			OriginalCity entity = this.originalService.findCity(code);
 			model.addAttribute("vm", entity);
 			return "original/city_edit";
 		} catch (EasysoftException e) {
@@ -188,7 +175,7 @@ public class OriginalDataController {
 
 		if (response.isResult()) {
 			try {
-				this.originalDataService.updateCity(request.getCode(), request.getName());
+				this.originalService.updateCity(request.getCode(), request.getName());
 				response.setMessage(this.messageSource.getMessage("edit_success"));
 
 			} catch (EasysoftException ex) {
@@ -208,8 +195,8 @@ public class OriginalDataController {
 		OriginalCity city = null;
 		String collectUrl = "";
 		try {
-			city = this.originalDataService.findCity(cityCode);
-			collectUrl = this.collectUrlService.getUrl(cityCode);
+			city = this.originalService.findCity(cityCode);
+			collectUrl = this.collectService.getUrl(cityCode);
 		} catch (EasysoftException e) {
 			logger.error(e.toString());
 			model.addAttribute("error", e.getMessage());
@@ -232,7 +219,7 @@ public class OriginalDataController {
 					request.isDesc() ? Direction.DESC : Direction.ASC, request.getSort());
 		}
 
-		Page<OriginalCounty> entities = this.originalDataService.findCounties(request.getCityCode(), request.getCode(),
+		Page<OriginalCounty> entities = this.originalService.findCounties(request.getCityCode(), request.getCode(),
 				request.getName(), pageable);
 		if (entities == null || entities.getTotalElements() == 0) {
 			return response;
@@ -246,7 +233,7 @@ public class OriginalDataController {
 	@RequestMapping("/county_{code}")
 	public String countyEdit(Model model, @PathVariable String code) {
 		try {
-			OriginalCounty entity = this.originalDataService.findCounty(code);
+			OriginalCounty entity = this.originalService.findCounty(code);
 			model.addAttribute("vm", entity);
 			return "original/county_edit";
 		} catch (EasysoftException e) {
@@ -265,7 +252,7 @@ public class OriginalDataController {
 
 		if (response.isResult()) {
 			try {
-				this.originalDataService.updateCounty(request.getCode(), request.getName());
+				this.originalService.updateCounty(request.getCode(), request.getName());
 				response.setMessage(this.messageSource.getMessage("edit_success"));
 
 			} catch (EasysoftException ex) {
@@ -288,8 +275,8 @@ public class OriginalDataController {
 			if ("00".equals(countyCode.substring(4, 6))) {
 				OriginalCity city = null;
 				try {
-					city = this.originalDataService.findCity(countyCode);
-					collectUrl = this.collectUrlService.getUrl(countyCode);
+					city = this.originalService.findCity(countyCode);
+					collectUrl = this.collectService.getUrl(countyCode);
 				} catch (EasysoftException e) {
 					logger.error(e.toString());
 					model.addAttribute("error", e.getMessage());
@@ -303,8 +290,8 @@ public class OriginalDataController {
 
 		OriginalCounty county = null;
 		try {
-			county = this.originalDataService.findCounty(countyCode);
-			collectUrl = this.collectUrlService.getUrl(countyCode);
+			county = this.originalService.findCounty(countyCode);
+			collectUrl = this.collectService.getUrl(countyCode);
 		} catch (EasysoftException e) {
 			logger.error(e.toString());
 			model.addAttribute("error", e.getMessage());
@@ -327,7 +314,7 @@ public class OriginalDataController {
 					request.isDesc() ? Direction.DESC : Direction.ASC, request.getSort());
 		}
 
-		Page<OriginalTown> entities = this.originalDataService.findTowns(request.getCountyCode(), request.getCode(),
+		Page<OriginalTown> entities = this.originalService.findTowns(request.getCountyCode(), request.getCode(),
 				request.getName(), pageable);
 		if (entities == null || entities.getTotalElements() == 0) {
 			return response;
@@ -341,7 +328,7 @@ public class OriginalDataController {
 	@RequestMapping("/town_{code}")
 	public String townEdit(Model model, @PathVariable String code) {
 		try {
-			OriginalTown entity = this.originalDataService.findTown(code);
+			OriginalTown entity = this.originalService.findTown(code);
 			model.addAttribute("vm", entity);
 			return "original/town_edit";
 		} catch (EasysoftException e) {
@@ -359,7 +346,7 @@ public class OriginalDataController {
 
 		if (response.isResult()) {
 			try {
-				this.originalDataService.updateTown(request.getCode(), request.getName());
+				this.originalService.updateTown(request.getCode(), request.getName());
 				response.setMessage(this.messageSource.getMessage("edit_success"));
 
 			} catch (EasysoftException ex) {
@@ -379,8 +366,8 @@ public class OriginalDataController {
 		OriginalTown town = null;
 		String collectUrl = "";
 		try {
-			town = this.originalDataService.findTown(townCode);
-			collectUrl = this.collectUrlService.getUrl(townCode);
+			town = this.originalService.findTown(townCode);
+			collectUrl = this.collectService.getUrl(townCode);
 		} catch (EasysoftException e) {
 			logger.error(e.toString());
 			model.addAttribute("error", e.getMessage());
@@ -403,7 +390,7 @@ public class OriginalDataController {
 					request.isDesc() ? Direction.DESC : Direction.ASC, request.getSort());
 		}
 
-		Page<OriginalVillage> entities = this.originalDataService.findVillages(request.getTownCode(), request.getCode(),
+		Page<OriginalVillage> entities = this.originalService.findVillages(request.getTownCode(), request.getCode(),
 				request.getName(), pageable);
 		if (entities == null || entities.getTotalElements() == 0) {
 			return response;
@@ -417,7 +404,7 @@ public class OriginalDataController {
 	@RequestMapping("/village_{code}")
 	public String villageEdit(Model model, @PathVariable String code) {
 		try {
-			OriginalVillage entity = this.originalDataService.findVillage(code);
+			OriginalVillage entity = this.originalService.findVillage(code);
 			model.addAttribute("vm", entity);
 			return "original/village_edit";
 		} catch (EasysoftException e) {
@@ -436,7 +423,7 @@ public class OriginalDataController {
 
 		if (response.isResult()) {
 			try {
-				this.originalDataService.updateVillage(request.getCode(), request.getName());
+				this.originalService.updateVillage(request.getCode(), request.getName());
 				response.setMessage(this.messageSource.getMessage("edit_success"));
 
 			} catch (EasysoftException ex) {
@@ -453,6 +440,9 @@ public class OriginalDataController {
 
 	@RequestMapping("/all")
 	public String all(Model model) {
+		
+		boolean canImport = this.originalService.canImport();
+		model.addAttribute("canImport", canImport);
 		return "original/all";
 	}
 
@@ -468,9 +458,9 @@ public class OriginalDataController {
 					request.isDesc() ? Direction.DESC : Direction.ASC, request.getSort());
 		}
 
-		Page<OriginalAll> entities = this.originalDataService.findAll(request.getProvinceName(), request.getCityName(),
+		Page<OriginalAll> entities = this.originalService.findAll(request.getProvinceName(), request.getCityName(),
 				request.getCountyName(), request.getTownName(), request.getVillageName(), pageable);
-		if (entities == null || entities.getTotalElements() == 0) {
+		if (!entities.hasContent()) {
 			return response;
 		}
 		response.setRows(entities.getContent());
@@ -486,7 +476,7 @@ public class OriginalDataController {
 		AjaxResponse response = new AjaxResponse();
 
 		try {
-			this.originalDataService.importToAll();
+			this.originalService.importToAll();
 			response.setMessage(this.messageSource.getMessage("action_success"));
 			response.setResult(true);
 
@@ -499,15 +489,14 @@ public class OriginalDataController {
 	
 	@RequestMapping(value = "/export/all", method = RequestMethod.POST)
 	@ResponseBody
-	public AjaxResponse exportAll() {
+	public AjaxResponse exportAll(@RequestBody OriginalAllPageRequest request) {
 
 		AjaxResponse response = new AjaxResponse();
 
 		try {
-			ApplicationHome h = new ApplicationHome(getClass());
-	        File jarF = h.getSource();
-			this.originalDataService.exportAll(jarF.getParentFile().toString());
-			response.setMessage(this.messageSource.getMessage("action_success"));
+			String fileName = this.originalService.exportAll(request.getProvinceName(), request.getCityName(), request.getCountyName(), request.getTownName(), request.getVillageName());
+			//response.setMessage(this.messageSource.getMessage("action_success"));
+			response.setData(fileName);
 			response.setResult(true);
 
 		} catch (Exception ex) {

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.easysoft.cad.domain.entity.CollectUrl;
-import com.easysoft.cad.domain.service.CollectUrlService;
+import com.easysoft.cad.domain.service.CollectService;
 import com.easysoft.cad.domain.valueObject.UrlCategory;
 import com.easysoft.cad.domain.valueObject.UrlStatus;
 import com.easysoft.cad.ui.viewModel.collect.CollectUrlPageRequest;
@@ -34,7 +34,7 @@ public class CollectController {
 	private static final Logger logger = LoggerFactory.getLogger(CollectController.class);
 
 	@Autowired
-	private CollectUrlService collectUrlService;
+	private CollectService collectService;
 
 	@Autowired
 	private EasysoftMessageSource messageSource;
@@ -42,7 +42,7 @@ public class CollectController {
 	@RequestMapping("/index")
 	public String index(Model model) {
 
-		boolean canCollect = this.collectUrlService.canCollect();
+		boolean canCollect = this.collectService.canCollect();
 		model.addAttribute("canCollect", canCollect);
 
 		Map<String, String> categoryList = new HashMap<String, String>();
@@ -72,7 +72,7 @@ public class CollectController {
 					request.isDesc() ? Direction.DESC : Direction.ASC, request.getSort());
 		}
 
-		Page<CollectUrl> entities = this.collectUrlService.findAll(request.getUrl(), request.getUrlCategory(),
+		Page<CollectUrl> entities = this.collectService.findAll(request.getUrl(), request.getUrlCategory(),
 				request.getUrlCode(), request.getStatus(), pageable);
 		if (entities == null || entities.getTotalElements() == 0) {
 			return response;
@@ -89,8 +89,8 @@ public class CollectController {
 
 		AjaxResponse response = new AjaxResponse();
 		try {
-			if (this.collectUrlService.canCollect()) {
-				this.collectUrlService.collect();
+			if (this.collectService.canCollect()) {
+				this.collectService.collect();
 				response.setMessage(this.messageSource.getMessage("action_success"));
 			} else {
 				response.setMessage(this.messageSource.getMessage("no_collect_task"));

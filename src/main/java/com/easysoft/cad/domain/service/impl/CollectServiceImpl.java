@@ -33,7 +33,7 @@ import com.easysoft.cad.domain.entity.OriginalCounty;
 import com.easysoft.cad.domain.entity.OriginalProvince;
 import com.easysoft.cad.domain.entity.OriginalTown;
 import com.easysoft.cad.domain.entity.OriginalVillage;
-import com.easysoft.cad.domain.service.CollectUrlService;
+import com.easysoft.cad.domain.service.CollectService;
 import com.easysoft.cad.domain.valueObject.UrlCategory;
 import com.easysoft.cad.domain.valueObject.UrlStatus;
 import com.easysoft.cad.infrastructure.repository.CollectUrlRepository;
@@ -46,9 +46,9 @@ import com.easysoft.core.util.EasysoftException;
 import com.easysoft.core.util.EasysoftMessageSource;
 
 @Service
-public class CollectUrlServiceImpl implements CollectUrlService {
+public class CollectServiceImpl implements CollectService {
 
-	private static final Logger logger = LoggerFactory.getLogger(CollectUrlServiceImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(CollectServiceImpl.class);
 
 	@Autowired
 	private EasysoftMessageSource messageSource;

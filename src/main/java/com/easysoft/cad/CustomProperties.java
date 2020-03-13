@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 public class CustomProperties {
 	
 	private String entryUrl;
+	private int exportPageSize;
+	private int exportRowAccessWindowSize;
 
 	public String getEntryUrl() {
 		return entryUrl;
@@ -17,4 +19,21 @@ public class CustomProperties {
 		this.entryUrl = entryUrl;
 	}
 
+	public int getExportPageSize() {
+		return exportPageSize;
+	}
+
+	public void setExportPageSize(int exportPageSize) {
+		this.exportPageSize = exportPageSize;
+	}
+
+	public int getExportRowAccessWindowSize() {
+		return exportRowAccessWindowSize;
+	}
+
+	public void setExportRowAccessWindowSize(int exportRowAccessWindowSize) {
+		this.exportRowAccessWindowSize = exportRowAccessWindowSize;
+	}
+
+	
 }

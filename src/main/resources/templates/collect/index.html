@@ -59,8 +59,9 @@
 								<i class="fa fa-search"></i> <span th:text="#{search}"></span>
 							</button>
 
-							<a th:if="${canCollect}" id="btn_collect" href="javascript:;" class="btn btn-info btn-sm" onclick="startCollect()">
-								<i class="fa fa-plus"></i> <span class="hidden-xs"
+							<a th:if="${canCollect}" id="btn_collect" href="javascript:;"
+								class="btn btn-info btn-sm" onclick="startCollect()"> <i
+								class="fa fa-plus"></i> <span class="hidden-xs"
 								th:text="#{collect}"></span>
 							</a>
 						</div>
@@ -98,80 +99,79 @@
 			highlightCurrentUrl();
 			
 			$('#table_list').bootstrapTable({
-			      url: '/collect/urls',
-			      method: 'post',
-			      pagination: true,    
-	              sortable: true,     
-	              sortOrder: 'asc', 
-			      striped: true,
-			      pageSize: 25,   
-	              pageList: [10, 25, 50, 100],
-	              sidePagination: 'server', 
-	              search: false,  
-	              queryParams : function (params) {
-	                	return {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
-	                        limit: params.limit,   //页面大小
-	                        offset: params.offset,  //页码
-	                        sort: params.sort,
-	                        order: params.order, 
-	                        url : $.trim($('#query_url').val()),
-	                        urlCategory : $.trim($('#query_url_category').val()),
-	                        urlCode : $.trim($('#query_url_code').val()),
-	                        status : $.trim($('#query_status').val())
-	                    };
-	                },
-	                // toolbar :'#toolbar',
-	                //Enable the strict search.    
-	                strictSearch: false,
-	                //Indicate which field is an identity field.
-	                idField : 'id',
-			      columns: [
-			    	  {
-				          	field: 'url',
-				          	title: [[#{url}]],
-				          	sortable: true,
-				          	formatter: urlFormatter
-				        },
-			        {
-			          	field: 'urlCategory',
-			          	title: [[#{category}]],
-			          	sortable: true,
-			          	width:200,
-			          	formatter: categoryFormatter
-			        },
-			        {
-			          	field: 'urlCode',
-			          	title: [[#{code}]],
-			          	sortable: true,
-			          	width:150
-			        },
-			        {
-			          	field: 'remark',
-			          	title: [[#{remark}]],
-			          	sortable: true
-			        },
+			 	url: '/collect/urls',
+			   	method: 'post',
+			   	pagination: true,    
+	           	sortable: true,     
+	           	sortOrder: 'asc', 
+			  	striped: true,
+			   	pageSize: 25,   
+	           	pageList: [10, 25, 50, 100],
+	           	sidePagination: 'server', 
+	          	search: false,  
+	          	queryParams : function (params) {
+	               	return {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+	                  	limit: params.limit,   //页面大小
+	                   	offset: params.offset,  //页码
+	                    sort: params.sort,
+	                    order: params.order, 
+	                    url : $.trim($('#query_url').val()),
+	                    urlCategory : $.trim($('#query_url_category').val()),
+	                    urlCode : $.trim($('#query_url_code').val()),
+	                    status : $.trim($('#query_status').val())
+	             	};
+	       		},
+	            // toolbar :'#toolbar',
+	            //Enable the strict search.    
+	          	strictSearch: false,
+	           	//Indicate which field is an identity field.
+	           	idField : 'id',
+			  	columns: [
+			     	{
+				      	field: 'url',
+				        title: [[#{url}]],
+				        sortable: true,
+				        formatter: urlFormatter
+				  	},
 				    {
-				       	field: 'status',
-				       	title: [[#{status}]],
+				       	field: 'urlCategory',
+				       	title: [[#{category}]],
 				       	sortable: true,
-				       	width:80,
-				       	align: 'center',
-			          	formatter: statusFormatter
-				    }
-			      ] 
-			    });
+				       	width:200,
+				       	formatter: categoryFormatter
+				 	},
+				  	{
+				      	field: 'urlCode',
+				       	title: [[#{code}]],
+				       	sortable: true,
+				      	width:150
+				  	},
+				   	{
+				      	field: 'remark',
+				       	title: [[#{remark}]],
+				       	sortable: true
+				  	},
+					{
+					  	field: 'status',
+					   	title: [[#{status}]],
+					   	sortable: true,
+					  	width:80,
+					  	align: 'center',
+				       	formatter: statusFormatter
+					}] 
+			});
 			
 			$('#btn_query').click(function(){
 				 $('#table_list').bootstrapTable('refresh');
 				 return false;
 			});
-
-			setInterval(function(){
-				$('#table_list').bootstrapTable('refresh');
-			},20 * 1000);
+			
+			if($('#btn_collect').length > 0){
+				setInterval(function(){
+					$('#table_list').bootstrapTable('refresh');
+				},20 * 1000);
+			}
 		});
-
-		
 
 		function urlFormatter(value, row, index){
 			return '<a href="' + value +'" target="_blank" >'
@@ -184,8 +184,7 @@
 			    	value = $(this).text();
 			    	return;
 			    }
-			  });
-			
+			});
 			return value;
 		}
 		
@@ -195,8 +194,7 @@
 			    	value = $(this).text();
 			    	return;
 			    }
-			  });
-			
+			});
 			return value;
 		}
 		
@@ -217,17 +215,17 @@
 					 	alertType = 'success';
 						alertIcon = 'check';
 					} 
-						App.alert({
-							container : '#action_alert',
-							place : 'prepend',
-							type : alertType,
-							message : json.message,
-							close : true,
-							reset : true,
-							focus : true,
-							closeInSeconds : 5,
-							icon : alertIcon
-						});
+					App.alert({
+						container : '#action_alert',
+						place : 'prepend',
+						type : alertType,
+						message : json.message,
+						close : true,
+						reset : true,
+						focus : true,
+						closeInSeconds : 5,
+						icon : alertIcon
+					});
 				}
 			});
 		}

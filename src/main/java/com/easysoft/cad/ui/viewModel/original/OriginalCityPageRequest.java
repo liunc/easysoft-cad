@@ -1,8 +1,8 @@
-package com.easysoft.cad.ui.viewModel.data;
+package com.easysoft.cad.ui.viewModel.original;
 
 import com.easysoft.core.web.viewModel.BootstrapTableRequest;
 
-public class OriginalProvincePageRequest extends BootstrapTableRequest {
+public class OriginalCityPageRequest extends BootstrapTableRequest {
 
 	private String provinceCode;
 	private String code;

@@ -1,4 +1,4 @@
-package com.easysoft.cad.ui.viewModel.data;
+package com.easysoft.cad.ui.viewModel.original;
 
 import com.easysoft.core.web.viewModel.BootstrapTableRequest;
 

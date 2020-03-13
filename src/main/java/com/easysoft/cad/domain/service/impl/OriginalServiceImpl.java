@@ -1,10 +1,7 @@
 package com.easysoft.cad.domain.service.impl;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -12,12 +9,8 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,7 +26,8 @@ import com.easysoft.cad.domain.entity.OriginalCounty;
 import com.easysoft.cad.domain.entity.OriginalProvince;
 import com.easysoft.cad.domain.entity.OriginalTown;
 import com.easysoft.cad.domain.entity.OriginalVillage;
-import com.easysoft.cad.domain.service.OriginalDataService;
+import com.easysoft.cad.domain.service.ExportService;
+import com.easysoft.cad.domain.service.OriginalService;
 import com.easysoft.cad.infrastructure.repository.OriginalAllRepository;
 import com.easysoft.cad.infrastructure.repository.OriginalCityRepository;
 import com.easysoft.cad.infrastructure.repository.OriginalCountyRepository;
@@ -44,9 +38,7 @@ import com.easysoft.core.util.EasysoftException;
 import com.easysoft.core.util.EasysoftMessageSource;
 
 @Service
-public class OriginalDataServiceImpl implements OriginalDataService {
-
-	private static final Logger logger = LoggerFactory.getLogger(OriginalDataServiceImpl.class);
+public class OriginalServiceImpl implements OriginalService {
 
 	@Autowired
 	private OriginalProvinceRepository originalProvinceRepository;
@@ -65,6 +57,9 @@ public class OriginalDataServiceImpl implements OriginalDataService {
 
 	@Autowired
 	private OriginalAllRepository originalAllRepository;
+
+	@Autowired
+	private ExportService exportService;
 
 	@Autowired
 	private EasysoftMessageSource messageSource;
@@ -337,6 +332,13 @@ public class OriginalDataServiceImpl implements OriginalDataService {
 		this.originalVillageRepository.save(entity);
 	}
 
+	public boolean canImport() {
+		if (this.originalAllRepository.count() == this.originalVillageRepository.count()) {
+			return false;
+		}
+		return true;
+	}
+
 	@Async("taskExecutor")
 	@Override
 	public void importToAll() {
@@ -453,35 +455,43 @@ public class OriginalDataServiceImpl implements OriginalDataService {
 		}, pageable);
 	}
 
-	//@Async("taskExecutor")
 	@Override
-	public void exportAll(String exportPath) {
+	public String exportAll(String provinceName, String cityName, String countyName, String townName,
+			String villageName) {
 
-		try {
-			logger.info(exportPath);
-			// HSSFWorkbook wb1 = new HSSFWorkbook();
-			@SuppressWarnings("resource")
-			XSSFWorkbook workbook = new XSSFWorkbook();
-			XSSFSheet sheets = workbook.createSheet("九九乘法表");
-			for (int i = 1; i <= 9; i++) {
-				XSSFRow row = sheets.createRow(i - 1);
-				for (int j = 1; j <= 9; j++) {
-					XSSFCell cell = row.createCell(j - 1);
-					cell.setCellValue(i + "*" + j + "=" + i * j);
-				}
+		int size = this.exportService.getExportPageSize();
 
+		SXSSFWorkbook workbook = this.exportService.createWorkbook();
+		SXSSFSheet sheet = this.exportService.createSheet(workbook, "中国行政区划（五级）");
+
+		String statsCode = this.messageSource.getMessage("stats_code");
+		List<String> header = Arrays.asList(statsCode, this.messageSource.getMessage("province"), statsCode,
+				this.messageSource.getMessage("city"), statsCode, this.messageSource.getMessage("county"), statsCode,
+				this.messageSource.getMessage("town"), statsCode,
+				this.messageSource.getMessage("city_or_country_category"), this.messageSource.getMessage("village"));
+		this.exportService.createRow(sheet, 0, header);
+
+		int pageIndex = 0;
+		int rowIndex = 1;
+		while (true) {
+			Page<OriginalAll> entities = this.findAll(provinceName, cityName, countyName, townName, villageName,
+					PageRequest.of(pageIndex, size));
+			if (!entities.hasContent()) {
+				break;
 			}
-			exportPath += "\\export";
-			File file = new File(exportPath);
-			if(!file.exists()) {
-				file.mkdirs();
+			for (OriginalAll entity : entities.getContent()) {
+				List<String> values = Arrays.asList(entity.getProvinceCode(), entity.getProvinceName(),
+						entity.getCityCode(), entity.getCityName(), entity.getCountyCode(), entity.getCountyName(),
+						entity.getTownCode(), entity.getTownName(), entity.getVillageCode(),
+						entity.getVillageCategory(), entity.getVillageName());
+				this.exportService.createRow(sheet, rowIndex, values);
+				rowIndex++;
 			}
-			FileOutputStream fileOutputStream = new FileOutputStream(exportPath +"\\test2.xlsx");
+			pageIndex++;
+		}
 
-			workbook.write(fileOutputStream);
-
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-		} 
+		String fileName = this.exportService.generateFileName();
+		this.exportService.saveFile(workbook, fileName);
+		return fileName;
 	}
 }
