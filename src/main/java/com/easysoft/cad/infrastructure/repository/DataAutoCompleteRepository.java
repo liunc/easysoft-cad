@@ -1,11 +1,9 @@
 package com.easysoft.cad.infrastructure.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-
 import com.easysoft.cad.domain.entity.DataAutoComplete;
+import com.easysoft.core.data.jpa.repository.BaseRepository;
 
-public interface DataAutoCompleteRepository extends JpaRepository<DataAutoComplete, String>, JpaSpecificationExecutor<DataAutoComplete> {
+public interface DataAutoCompleteRepository extends BaseRepository<DataAutoComplete, String> {
 
 	
 }

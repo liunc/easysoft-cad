@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +41,7 @@ import com.easysoft.cad.infrastructure.repository.OriginalCountyRepository;
 import com.easysoft.cad.infrastructure.repository.OriginalProvinceRepository;
 import com.easysoft.cad.infrastructure.repository.OriginalTownRepository;
 import com.easysoft.cad.infrastructure.repository.OriginalVillageRepository;
+import com.easysoft.core.data.jpa.repository.BaseRepository;
 import com.easysoft.core.util.EasysoftException;
 import com.easysoft.core.util.EasysoftMessageSource;
 
@@ -84,8 +84,8 @@ public class CollectServiceImpl implements CollectService {
 			try {
 				URL url = new URL(collectUrl);
 				HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-				connection.setConnectTimeout(8 * 1000);
-				connection.setReadTimeout(8 * 1000);
+				connection.setConnectTimeout(this.properties.getUrlConnectTimeout() * 1000);
+				connection.setReadTimeout(this.properties.getConnectReadTimeout() * 1000);
 				connection.setInstanceFollowRedirects(false);
 				return Jsoup.parse(connection.getInputStream(), "GBK", baseUrl);
 			} catch (Exception e) {
@@ -106,11 +106,12 @@ public class CollectServiceImpl implements CollectService {
 
 	@Transactional(rollbackFor = Exception.class)
 	protected <T, ID> Iterable<CollectUrl> save(CollectUrl current, Iterable<CollectUrl> children,
-			CrudRepository<T, ID> dataRepository, Iterable<T> entities) {
+			BaseRepository<T, ID> dataRepository, Iterable<T> entities) {
+		int insertInBatchPageSize = this.properties.getInsertInBatchPageSize();
 		if (children != null) {
-			children = this.collectUrlRepository.saveAll(children);
+			children = this.collectUrlRepository.insertInBatch(children, insertInBatchPageSize);
 		}
-		dataRepository.saveAll(entities);
+		dataRepository.insertInBatch(entities, insertInBatchPageSize);
 		this.collectUrlRepository.save(current);
 		return children;
 	}

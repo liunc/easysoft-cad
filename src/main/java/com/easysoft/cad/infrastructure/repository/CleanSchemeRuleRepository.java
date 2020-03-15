@@ -2,12 +2,10 @@ package com.easysoft.cad.infrastructure.repository;
 
 import java.util.List;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-
 import com.easysoft.cad.domain.entity.CleanSchemeRule;
+import com.easysoft.core.data.jpa.repository.BaseRepository;
 
-public interface CleanSchemeRuleRepository extends JpaRepository<CleanSchemeRule, String>, JpaSpecificationExecutor<CleanSchemeRule> {
+public interface CleanSchemeRuleRepository extends BaseRepository<CleanSchemeRule, String> {
 
 	public List<CleanSchemeRule> findBySchemeId(String schemeId);
 	

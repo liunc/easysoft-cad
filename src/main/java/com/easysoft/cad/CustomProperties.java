@@ -8,6 +8,10 @@ import org.springframework.stereotype.Component;
 public class CustomProperties {
 	
 	private String entryUrl;
+	private int urlConnectTimeout;
+	private int connectReadTimeout;
+	private int insertInBatchPageSize;
+	private int importPageSize;
 	private int exportPageSize;
 	private int exportRowAccessWindowSize;
 
@@ -17,6 +21,38 @@ public class CustomProperties {
 
 	public void setEntryUrl(String entryUrl) {
 		this.entryUrl = entryUrl;
+	}
+
+	public int getUrlConnectTimeout() {
+		return urlConnectTimeout;
+	}
+
+	public void setUrlConnectTimeout(int urlConnectTimeout) {
+		this.urlConnectTimeout = urlConnectTimeout;
+	}
+
+	public int getConnectReadTimeout() {
+		return connectReadTimeout;
+	}
+
+	public void setConnectReadTimeout(int connectReadTimeout) {
+		this.connectReadTimeout = connectReadTimeout;
+	}
+
+	public int getInsertInBatchPageSize() {
+		return insertInBatchPageSize;
+	}
+
+	public void setInsertInBatchPageSize(int insertInBatchPageSize) {
+		this.insertInBatchPageSize = insertInBatchPageSize;
+	}
+
+	public int getImportPageSize() {
+		return importPageSize;
+	}
+
+	public void setImportPageSize(int importPageSize) {
+		this.importPageSize = importPageSize;
 	}
 
 	public int getExportPageSize() {

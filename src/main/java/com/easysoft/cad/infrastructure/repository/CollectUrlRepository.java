@@ -2,17 +2,15 @@ package com.easysoft.cad.infrastructure.repository;
 
 import java.util.List;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-
 import com.easysoft.cad.domain.entity.CollectUrl;
+import com.easysoft.core.data.jpa.repository.BaseRepository;
 
 /**
  * 采集数据Url仓储接口
  * 
  * @author 刘年超
  */
-public interface CollectUrlRepository extends JpaRepository<CollectUrl, String>, JpaSpecificationExecutor<CollectUrl> {
+public interface CollectUrlRepository extends BaseRepository<CollectUrl, String> {
 
 	public CollectUrl findByUrlCode(String urlCode);
 	

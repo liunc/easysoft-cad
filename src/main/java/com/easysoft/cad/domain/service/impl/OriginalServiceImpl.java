@@ -20,6 +20,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import com.easysoft.cad.CustomProperties;
 import com.easysoft.cad.domain.entity.OriginalAll;
 import com.easysoft.cad.domain.entity.OriginalCity;
 import com.easysoft.cad.domain.entity.OriginalCounty;
@@ -64,6 +65,9 @@ public class OriginalServiceImpl implements OriginalService {
 	@Autowired
 	private EasysoftMessageSource messageSource;
 
+	@Autowired
+	private CustomProperties properties;
+	
 	@Override
 	public Page<OriginalProvince> findProvinces(String code, String name, Pageable pageable) {
 
@@ -342,25 +346,25 @@ public class OriginalServiceImpl implements OriginalService {
 	@Async("taskExecutor")
 	@Override
 	public void importToAll() {
-		long count = this.originalAllRepository.count();
-		if (count != 0) {
-			this.originalAllRepository.deleteAllInBatch();
-		}
-		count = this.originalVillageRepository.count();
+	
+		this.originalAllRepository.deleteAllInBatch();
 
-		int size = 1000;
-		long page = count / size;
-		if (count % size > 0) {
-			page += 1;
-		}
-
-		for (int i = 0; i < page; i++) {
-			Page<OriginalVillage> villages = this.originalVillageRepository.findAll(PageRequest.of(i, size));
+		OriginalProvince province = new OriginalProvince();
+		OriginalCity city = new OriginalCity();
+		OriginalCounty county = new OriginalCounty();
+		OriginalTown town = new OriginalTown();
+		
+		int importPageSize = this.properties.getImportPageSize();
+		int insertInBatchPageSize = this.properties.getInsertInBatchPageSize();
+		
+		int i = 0;
+		while(true) {
+			Page<OriginalVillage> villages = this.originalVillageRepository.findAll(PageRequest.of(i, importPageSize));
+			if(!villages.hasContent()) {
+				break;
+			}
+			
 			List<OriginalAll> entities = new ArrayList<OriginalAll>();
-			OriginalProvince province = new OriginalProvince();
-			OriginalCity city = new OriginalCity();
-			OriginalCounty county = new OriginalCounty();
-			OriginalTown town = new OriginalTown();
 			for (OriginalVillage village : villages.getContent()) {
 				OriginalAll entity = new OriginalAll();
 				entity.create(village.getCode(), village.getCategory(), village.getName());
@@ -408,7 +412,8 @@ public class OriginalServiceImpl implements OriginalService {
 
 				entities.add(entity);
 			}
-			this.originalAllRepository.saveAll(entities);
+			this.originalAllRepository.insertInBatch(entities, insertInBatchPageSize);
+			i++;
 		}
 	}
 

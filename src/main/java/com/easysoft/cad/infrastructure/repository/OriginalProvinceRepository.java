@@ -1,15 +1,14 @@
 package com.easysoft.cad.infrastructure.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor; 
 import com.easysoft.cad.domain.entity.OriginalProvince;
+import com.easysoft.core.data.jpa.repository.BaseRepository;
 
 /**
  * 省、直辖市、自治区仓储接口
  * 
  * @author 刘年超
  */
-public interface OriginalProvinceRepository extends JpaRepository<OriginalProvince, String>, JpaSpecificationExecutor<OriginalProvince> {
+public interface OriginalProvinceRepository extends BaseRepository<OriginalProvince, String>{
 
 	public OriginalProvince findByCode(String code);
 }

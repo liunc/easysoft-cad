@@ -1,16 +1,14 @@
 package com.easysoft.cad.infrastructure.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-
 import com.easysoft.cad.domain.entity.CleanRule;
+import com.easysoft.core.data.jpa.repository.BaseRepository;
 
 /**
  * 清洗规则仓储接口
  * 
  * @author 刘年超
  */
-public interface CleanRuleRepository extends JpaRepository<CleanRule, String>, JpaSpecificationExecutor<CleanRule> {
+public interface CleanRuleRepository extends BaseRepository<CleanRule, String> {
 	
 	public boolean existsByDataCategoryAndSearchText(String dataCategory, String searchText);
 

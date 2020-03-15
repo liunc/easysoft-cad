@@ -1,9 +1,8 @@
 package com.easysoft.cad.infrastructure.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import com.easysoft.cad.domain.entity.OriginalAll;
+import com.easysoft.core.data.jpa.repository.BaseRepository;
 
-public interface OriginalAllRepository extends JpaRepository<OriginalAll, String>, JpaSpecificationExecutor<OriginalAll> {
+public interface OriginalAllRepository extends BaseRepository<OriginalAll, String> {
 
 }

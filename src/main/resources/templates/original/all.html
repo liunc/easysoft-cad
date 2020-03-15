@@ -62,7 +62,8 @@
 								class="btn btn-info btn-sm" onclick="startImport()"> <i
 								class="glyphicon glyphicon-import"></i> <span class="hidden-xs"
 								th:text="#{import}"></span>
-							</a> <a id="btn_export" href="javascript:;"
+							</a> 
+							<a th:unless="${canImport}" id="btn_export" href="javascript:;"
 								class="btn btn-info btn-sm" onclick="startExport()"> <i
 								class="glyphicon glyphicon-export"></i> <span class="hidden-xs"
 								th:text="#{export}"></span>
