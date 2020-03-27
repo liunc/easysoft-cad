@@ -1,5 +1,6 @@
 package com.easysoft.cad.ui.controller;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -36,7 +37,7 @@ import com.easysoft.core.web.viewModel.BootstrapTableResponse;
 
 @Controller
 @RequestMapping("/original")
-public class OriginalController {
+public class OriginalController extends BaseController {
 
 	private static final Logger logger = LoggerFactory.getLogger(OriginalController.class);
 
@@ -50,7 +51,10 @@ public class OriginalController {
 	private EasysoftMessageSource messageSource;
 
 	@RequestMapping("/index")
-	public String index(Model model) {
+	public String index(Model model, HttpServletRequest request) {
+		
+		super.getLayoutData(model, request);
+		
 		return "original/index";
 	}
 
@@ -439,7 +443,9 @@ public class OriginalController {
 	}
 
 	@RequestMapping("/all")
-	public String all(Model model) {
+	public String all(Model model, HttpServletRequest request) {
+		
+		super.getLayoutData(model, request);
 		
 		boolean canImport = this.originalService.canImport();
 		model.addAttribute("canImport", canImport);

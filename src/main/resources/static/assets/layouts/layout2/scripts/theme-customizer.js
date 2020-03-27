@@ -1,6 +1,8 @@
 var ThemeCustomizer = function() {
     var e = function() {
+    	/*
         var e = $(".theme-panel");
+        	
         $("body").hasClass("page-boxed") === !1 && $(".layout-option", e).val("fluid"),
         $(".sidebar-option", e).val("default"),
         $(".page-header-option", e).val("fixed"),
@@ -49,29 +51,9 @@ var ThemeCustomizer = function() {
                 placement: "right"
             })),
             Layout.fixContentHeight(),
-            Layout.initFixedSidebar()
+            Layout.initFixedSidebar() 
         },
-        i = function(e) {
-            var a = App.isRTL() ? e + "-rtl": e;
-            $("#style_color").attr("href", Layout.getLayoutCssPath() + "themes/" + a + ".min.css");
-        };
-        $(".toggler", e).click(function() {
-            $(".toggler").hide(),
-            $(".toggler-close").show(),
-            $(".theme-panel > .theme-options").show()
-        }),
-        $(".toggler-close", e).click(function() {
-            $(".toggler").show(),
-            $(".toggler-close").hide(),
-            $(".theme-panel > .theme-options").hide()
-        }),
-        $(".theme-colors > ul > li", e).click(function() {
-            var a = $(this).attr("data-style");
-            i(a),
-            $("ul > li", e).removeClass("current"),
-            $(this).addClass("current")
-			"undefined" != typeof Cookies && Cookies.set("theme-colors", a)
-        }),
+        
         $("body").hasClass("page-boxed") && $(".layout-option", e).val("boxed"),
         $("body").hasClass("page-sidebar-fixed") && $(".sidebar-option", e).val("fixed"),
         $("body").hasClass("page-header-fixed") && $(".page-header-option", e).val("fixed"),
@@ -86,36 +68,77 @@ var ThemeCustomizer = function() {
         $(".sidebar-style-option", e).val(),
         $(".sidebar-menu-option", e).val();
         $(".layout-option, .page-header-top-dropdown-style-option, .page-header-option, .sidebar-option, .page-footer-option, .sidebar-pos-option, .sidebar-style-option, .sidebar-menu-option", e).change(t)
-		
-		if("undefined" != typeof Cookies){
-			var themeColors = Cookies.get("theme-colors");
-			if("undefined" != typeof themeColors){	
-				//i(themeColors);
-				$(".theme-colors > ul > li", e).each(function(){
-					if(themeColors === $(this).attr("data-style")){
-						$("ul > li", e).removeClass("current");
-						$(this).addClass("current");
-					}
-				})
-			}
-		}
+        */ 
     },
-    a = function(e) {
-        var a = "rounded" === e ? "components-rounded": "components";
-        a = App.isRTL() ? a + "-rtl": a,
-        $("#style_components").attr("href", App.getGlobalCssPath() + a + ".min.css"),
-        "undefined" != typeof Cookies && Cookies.set("layout-style-option", e)
+    loadToggler = function(){
+    	// 打开面板事件
+        $(".toggler", e).click(function() {
+            $(".toggler").hide();
+            $(".toggler-close").show();
+            $(".theme-panel > .theme-options").show();
+        });
+        
+        // 隐藏面板事件
+        $(".toggler-close", e).click(function() {
+            $(".toggler").show();
+            $(".toggler-close").hide();
+            $(".theme-panel > .theme-options").hide();
+        });
+    },
+    loadColor = function(){
+    	// 初始化 theme style  
+        $(".theme-panel .theme-colors > ul > li").each(function() {
+            var a = $(this).attr("data-style");
+            if($("#style_color").attr("href").indexOf(a) > 0){
+            	$("ul > li", e).removeClass("current");
+            	$(this).addClass("current");
+            	return false; // 相当于break
+            }
+        });
+        
+        // theme style 切换事件
+        $(".theme-panel .theme-colors > ul > li").click(function() {
+            var themeStyle = $(this).attr("data-style");
+            if(App.isRTL()){ 
+            	themeStyle += "-rtl";
+            }
+            $("#style_color").attr("href", Layout.getLayoutCssPath() + "themes/" + themeStyle + ".min.css");
+            if("undefined" != typeof Cookies) { 
+            	Cookies.set("theme-color", themeStyle);
+            }
+            $(".theme-panel ul > li").removeClass("current"),
+            $(this).addClass("current")
+        });
+    },
+    loadStyle = function(){
+    	var componentName = "square";
+    	// 初始化 components
+        if($("#style_components").attr("href").indexOf("components-rounded") > 0){
+        	componentName = "rounded";
+        }
+        $(".theme-panel .layout-style-option").val(componentName);
+        
+        // components 切换事件
+        $(".theme-panel .layout-style-option").change(function() {
+        	var styleName = "rounded" === $(this).val() ? "components-rounded": "components";
+        	if(App.isRTL()){
+        		styleName += "-rtl";
+        	} 
+        	$("#style_components").attr("href", App.getGlobalCssPath() + styleName + ".min.css");
+        	if("undefined" != typeof Cookies) { 
+        		Cookies.set("layout-style-option", $(this).val());
+        	}
+        });
     };
     return {
         init: function() {
-            e(),
-            $(".theme-panel .layout-style-option").change(function() {
-                a($(this).val())
-            }),
-            "undefined" != typeof Cookies && "rounded" === Cookies.get("layout-style-option") && (a(Cookies.get("layout-style-option")), $(".theme-panel .layout-style-option").val(Cookies.get("layout-style-option")))
+            e();
+            loadToggler();
+            loadColor();
+            loadStyle();
         }
     }
 } ();
 App.isAngularJsApp() === !1 && jQuery(document).ready(function() {
-    ThemeCustomizer.init()
+	ThemeCustomizer.init()
 });

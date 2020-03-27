@@ -3,6 +3,7 @@ package com.easysoft.cad.ui.controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -35,7 +36,7 @@ import com.easysoft.core.web.viewModel.BootstrapTableResponse;
 
 @Controller
 @RequestMapping("/clean")
-public class CleanController {
+public class CleanController extends BaseController {
 
 	private static final Logger logger = LoggerFactory.getLogger(CleanController.class);
 
@@ -46,7 +47,9 @@ public class CleanController {
 	private EasysoftMessageSource messageSource;
 
 	@RequestMapping("/rule")
-	public String rule(Model model) {
+	public String rule(Model model, HttpServletRequest request) {
+		
+		super.getLayoutData(model, request);
 
 		Map<String, String> categoryList = new HashMap<String, String>();
 		for (String category : DataCategory.list()) {

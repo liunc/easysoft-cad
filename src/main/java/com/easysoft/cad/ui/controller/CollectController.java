@@ -3,6 +3,8 @@ package com.easysoft.cad.ui.controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +31,7 @@ import com.easysoft.core.web.viewModel.BootstrapTableResponse;
 
 @Controller
 @RequestMapping("/collect")
-public class CollectController {
+public class CollectController extends BaseController {
 
 	private static final Logger logger = LoggerFactory.getLogger(CollectController.class);
 
@@ -40,7 +42,9 @@ public class CollectController {
 	private EasysoftMessageSource messageSource;
 
 	@RequestMapping("/index")
-	public String index(Model model) {
+	public String index(Model model, HttpServletRequest request) {
+		
+		super.getLayoutData(model, request);
 
 		boolean canCollect = this.collectService.canCollect();
 		model.addAttribute("canCollect", canCollect);
